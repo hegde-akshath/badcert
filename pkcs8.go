@@ -9,7 +9,7 @@ import (
 	"crypto/ecdsa"
 	"crypto/ed25519"
 	"crypto/rsa"
-	"crypto/x509/pkix"
+	"badcert/pkix"
 	"encoding/asn1"
 	"errors"
 	"fmt"

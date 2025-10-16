@@ -9,7 +9,7 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
-	"crypto/x509/pkix"
+	"badcert/pkix"
 	"encoding/asn1"
 	"encoding/pem"
 	"errors"
@@ -2647,7 +2647,7 @@ func TestPoliciesValid(t *testing.T) {
 	// parsing as part of the verification process. Those tests are in
 	// TestParsePolicies.
 	//
-	// [0] https://boringssl.googlesource.com/boringssl/+/264f4f7a958af6c4ccb04662e302a99dfa7c5b85/crypto/x509/x509_test.cc#5913
+	// [0] https://boringssl.googlesource.com/boringssl/+/264f4f7a958af6c4ccb04662e302a99dfa7c5b85/badcert/x509_test.cc#5913
 
 	testOID1 := mustNewOIDFromInts([]uint64{1, 2, 840, 113554, 4, 1, 72585, 2, 1})
 	testOID2 := mustNewOIDFromInts([]uint64{1, 2, 840, 113554, 4, 1, 72585, 2, 2})

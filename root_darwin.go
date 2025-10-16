@@ -5,7 +5,7 @@
 package badcert
 
 import (
-	"crypto/x509/internal/macos"
+	"badcert/internal/macos"
 	"errors"
 	"fmt"
 )

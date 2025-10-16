@@ -16,7 +16,7 @@ import (
 	"crypto/rsa"
 	_ "crypto/sha256"
 	_ "crypto/sha512"
-	"crypto/x509/pkix"
+	"badcert/pkix"
 	"encoding/asn1"
 	"encoding/base64"
 	"encoding/gob"

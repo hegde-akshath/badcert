@@ -7,7 +7,7 @@ package badcert
 import (
 	"bytes"
 	"crypto"
-	"crypto/x509/pkix"
+	"badcert/pkix"
 	"errors"
 	"fmt"
 	"iter"
@@ -786,7 +786,7 @@ func (c *Certificate) Verify(opts VerifyOptions) (chains [][]*Certificate, err e
 	for i := 0; i < opts.Intermediates.len(); i++ {
 		c, _, err := opts.Intermediates.cert(i)
 		if err != nil {
-			return nil, fmt.Errorf("crypto/x509: error fetching intermediate: %w", err)
+			return nil, fmt.Errorf("badcert: error fetching intermediate: %w", err)
 		}
 		if len(c.Raw) == 0 {
 			return nil, errNotParsed
