@@ -4,7 +4,7 @@
 
 package badcert
 
-import "internal/goos"
+import "github.com/hegde-akshath/badcert/goos"
 
 // Possible certificate files; stop after finding one.
 var certFiles = []string{

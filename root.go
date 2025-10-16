@@ -5,7 +5,7 @@
 package badcert
 
 import (
-	"internal/godebug"
+	"github.com/hegde-akshath/badcert/godebug"
 	"sync"
 	_ "unsafe" // for linkname
 )

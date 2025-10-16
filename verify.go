@@ -7,7 +7,7 @@ package badcert
 import (
 	"bytes"
 	"crypto"
-	"badcert/pkix"
+	"github.com/hegde-akshath/badcert/pkix"
 	"errors"
 	"fmt"
 	"iter"

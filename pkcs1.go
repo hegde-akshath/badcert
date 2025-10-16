@@ -8,7 +8,7 @@ import (
 	"crypto/rsa"
 	"encoding/asn1"
 	"errors"
-	"internal/godebug"
+	"github.com/hegde-akshath/badcert/godebug"
 	"math/big"
 )
 

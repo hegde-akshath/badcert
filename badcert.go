@@ -25,7 +25,7 @@ import (
 	"os"
 	"crypto/rand"
 	"crypto/rsa"
-	"badcert/pkix"
+	"github.com/hegde-akshath/badcert/pkix"
 	"encoding/asn1"
 	"encoding/pem"
 	"math/big"

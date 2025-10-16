@@ -9,7 +9,7 @@ import (
 	"crypto/ecdsa"
 	"crypto/ed25519"
 	"crypto/rsa"
-	"badcert/pkix"
+	"github.com/hegde-akshath/badcert/pkix"
 	"encoding/asn1"
 	"errors"
 	"fmt"
