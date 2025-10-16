@@ -4,7 +4,7 @@
 
 //go:build dragonfly || freebsd || linux || netbsd || openbsd || solaris
 
-package x509
+package badcert
 
 import (
 	"bytes"

@@ -4,7 +4,7 @@
 
 //go:build linux
 
-package x509
+package badcert
 
 import (
 	"encoding/pem"

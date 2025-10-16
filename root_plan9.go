@@ -4,7 +4,7 @@
 
 //go:build plan9
 
-package x509
+package badcert
 
 import (
 	"os"

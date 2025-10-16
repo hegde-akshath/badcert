@@ -18,7 +18,7 @@
 // On macOS and Windows, certificate verification is handled by system APIs, but
 // the package aims to apply consistent validation rules across operating
 // systems.
-package x509
+package badcert
 
 import (
 	"fmt"

@@ -4,7 +4,7 @@
 
 //go:build wasm
 
-package x509
+package badcert
 
 // Possible certificate files; stop after finding one.
 var certFiles = []string{}
