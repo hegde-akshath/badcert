@@ -17,7 +17,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/hegde-akshath/badcert/godebug"
-	"math"
+	//"math"
 	"math/big"
 	"net"
 	"net/url"
@@ -378,8 +378,10 @@ func parseBasicConstraintsExtension(der cryptobyte.String) (bool, int, error) {
 	maxPathLen := -1
 	if der.PeekASN1Tag(cryptobyte_asn1.INTEGER) {
 		var mpl uint
-		if !der.ReadASN1Integer(&mpl) || mpl > math.MaxInt {
-			return false, 0, errors.New("x509: invalid basic constraints")
+		//Tweaking this to allow negative pathlen values
+		//if !der.ReadASN1Integer(&mpl) || mpl > math.MaxInt {
+		if !der.ReadASN1Integer(&mpl) {
+		        return false, 0, errors.New("x509: invalid basic constraints")
 		}
 		maxPathLen = int(mpl)
 	}
