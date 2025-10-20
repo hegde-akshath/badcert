@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"crypto/rsa"
 	"crypto/rand"
 	"github.com/hegde-akshath/badcert"
@@ -129,8 +128,8 @@ func BuildDefaultLeafRecipe() (*badcert.BadCertificate) {
 //So it can't be sued in cases where the bad certificate is created due to modification related to key or signature params
 //Or a chain with a different setup
 //In such cases, use the underlying cert generation functions directly
-func BuildBadCertificateChains(badRootCARecipe *badcert.BadCertificate, badIntermed1CARecipe *badcert.BadCertificate, badLeafRecipe *badcert.BadCertificate, outputDirectory string) {
-        goodRootCARecipe      := BuildDefaultRootCARecipe()
+func BuildBadCertificateChains(badRootCARecipe *badcert.BadCertificate, badIntermed1CARecipe *badcert.BadCertificate, badLeafRecipe *badcert.BadCertificate) (*BadCertificateChains) {
+	goodRootCARecipe      := BuildDefaultRootCARecipe()
         goodIntermed1CARecipe := BuildDefaultIntermed1CARecipe()
         goodLeafRecipe        := BuildDefaultLeafRecipe()
  
@@ -141,37 +140,25 @@ func BuildBadCertificateChains(badRootCARecipe *badcert.BadCertificate, badInter
         badIntermed1CARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
 	badLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
         
-	certChain1 := []*badcert.BadCertificate{badRootCARecipe}
-	badcert.WriteCertificateChainPem(certChain1, fmt.Sprintf("%s/1.pem", outputDirectory))
+	certChain1 := CreateBadCertificateChain(badRootCARecipe)
+	certChain2 := CreateBadCertificateChain(goodLeafRecipe, goodIntermed1CARecipe, badRootCARecipe)
+	certChain3 := CreateBadCertificateChain(goodLeafRecipe, badIntermed1CARecipe, goodRootCARecipe)
+	certChain4 := CreateBadCertificateChain(goodLeafRecipe, badIntermed1CARecipe, badRootCARecipe)
+	certChain5 := CreateBadCertificateChain(badLeafRecipe, goodIntermed1CARecipe, badRootCARecipe)
+	certChain6 := CreateBadCertificateChain(badLeafRecipe, badIntermed1CARecipe, goodRootCARecipe)
+	certChain7 := CreateBadCertificateChain(badLeafRecipe, badIntermed1CARecipe, badRootCARecipe)
+	certChain8 := CreateBadCertificateChain(badLeafRecipe, goodIntermed1CARecipe, goodRootCARecipe)
 
-	certChain2 := []*badcert.BadCertificate{goodLeafRecipe, goodIntermed1CARecipe, badRootCARecipe}
-	badcert.WriteCertificateChainPem(certChain2, fmt.Sprintf("%s/2.pem", outputDirectory))
-
-	certChain3 := []*badcert.BadCertificate{goodLeafRecipe, badIntermed1CARecipe, goodRootCARecipe}
-	badcert.WriteCertificateChainPem(certChain3, fmt.Sprintf("%s/3.pem", outputDirectory))
-	
-	certChain4 := []*badcert.BadCertificate{goodLeafRecipe, badIntermed1CARecipe, badRootCARecipe}
-	badcert.WriteCertificateChainPem(certChain4, fmt.Sprintf("%s/4.pem", outputDirectory))
-	
-	certChain5 := []*badcert.BadCertificate{badLeafRecipe, goodIntermed1CARecipe, badRootCARecipe}
-	badcert.WriteCertificateChainPem(certChain5, fmt.Sprintf("%s/5.pem", outputDirectory))
-	
-	certChain6 := []*badcert.BadCertificate{badLeafRecipe, badIntermed1CARecipe, goodRootCARecipe}
-	badcert.WriteCertificateChainPem(certChain6, fmt.Sprintf("%s/6.pem", outputDirectory))
-	
-	certChain7 := []*badcert.BadCertificate{badLeafRecipe, badIntermed1CARecipe, badRootCARecipe}
-	badcert.WriteCertificateChainPem(certChain7, fmt.Sprintf("%s/7.pem", outputDirectory))
-	
-	certChain8 := []*badcert.BadCertificate{badLeafRecipe, goodIntermed1CARecipe, goodRootCARecipe}
-	badcert.WriteCertificateChainPem(certChain8, fmt.Sprintf("%s/8.pem", outputDirectory))
+	badCertificateChains := CreateBadCertificateChains(certChain1, certChain2, certChain3, certChain4, certChain5, certChain6, certChain7, certChain8)
+	return &badCertificateChains
 }
 
 //This is meant to be a quick generator of combinations of  3 level cert chain. The keys used for signing are from default parameters
 //So it can't be sued in cases where the bad certificate is created due to modification related to key or signature params
 //Or a chain with a different setup
 //In such cases, use the underlying cert generation functions directly
-func BuildBadCACertificateChains(badRootCARecipe *badcert.BadCertificate, badIntermed1CARecipe *badcert.BadCertificate, outputDirectory string) {
-        goodRootCARecipe      := BuildDefaultRootCARecipe()
+func BuildBadCACertificateChains(badRootCARecipe *badcert.BadCertificate, badIntermed1CARecipe *badcert.BadCertificate) (*BadCertificateChains) {
+	goodRootCARecipe      := BuildDefaultRootCARecipe()
         goodIntermed1CARecipe := BuildDefaultIntermed1CARecipe()
         goodLeafRecipe        := BuildDefaultLeafRecipe()
  
@@ -181,16 +168,12 @@ func BuildBadCACertificateChains(badRootCARecipe *badcert.BadCertificate, badInt
         badRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
         badIntermed1CARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
         
-	certChain1 := []*badcert.BadCertificate{badRootCARecipe}
-	badcert.WriteCertificateChainPem(certChain1, fmt.Sprintf("%s/1.pem", outputDirectory))
+	certChain1 := CreateBadCertificateChain(badRootCARecipe)
+	certChain2 := CreateBadCertificateChain(goodLeafRecipe, goodIntermed1CARecipe, badRootCARecipe)
+	certChain3 := CreateBadCertificateChain(goodLeafRecipe, badIntermed1CARecipe, goodRootCARecipe)	
+	certChain4 := CreateBadCertificateChain(goodLeafRecipe, badIntermed1CARecipe, badRootCARecipe)
 
-	certChain2 := []*badcert.BadCertificate{goodLeafRecipe, goodIntermed1CARecipe, badRootCARecipe}
-	badcert.WriteCertificateChainPem(certChain2, fmt.Sprintf("%s/2.pem", outputDirectory))
-
-	certChain3 := []*badcert.BadCertificate{goodLeafRecipe, badIntermed1CARecipe, goodRootCARecipe}
-	badcert.WriteCertificateChainPem(certChain3, fmt.Sprintf("%s/3.pem", outputDirectory))
-	
-	certChain4 := []*badcert.BadCertificate{goodLeafRecipe, badIntermed1CARecipe, badRootCARecipe}
-	badcert.WriteCertificateChainPem(certChain4, fmt.Sprintf("%s/4.pem", outputDirectory))
+	badCertificateChains := CreateBadCertificateChains(certChain1, certChain2, certChain3, certChain4)
+	return &badCertificateChains
 }
 
