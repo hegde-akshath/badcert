@@ -22,7 +22,7 @@ package badcert
 
 import (
 	"fmt"
-	"os"
+	"io"
 	"crypto/rand"
 	"crypto/rsa"
 	"github.com/hegde-akshath/badcert/pkix"
@@ -628,36 +628,6 @@ func (badcert *BadCertificate) SignTBS(privKey *rsa.PrivateKey, signatureAlgorit
 	return badcert
 }
 
-func (badcert *BadCertificate) WriteCertificateDer(filepath string) (*BadCertificate) {
-        var err error
-	err = os.WriteFile(filepath, badcert.x509Certificate.Raw, 0644)
-        if err != nil {
-                panic(err)
-        }
-	return badcert
-}
-
-func (badcert *BadCertificate) WriteCertificatePem(filepath string) (*BadCertificate) {
-        var err error
-        
-	file, err := os.Create(filepath)
-        if err != nil {
-		panic(err)
-        }
-        defer file.Close()
-
-	pemBlock := &pem.Block{
-                        Type:  "CERTIFICATE",
-                        Bytes: badcert.x509Certificate.Raw,
-                    }
-
-        err = pem.Encode(file, pemBlock)
-	if err != nil {
-		panic(err)
-	}
-	return badcert
-}
-
 //NOTE: This doesn't verify exactly what we want. In our case, we have created a chain and we are aware of the exact path from leaf to root
 //We need to make sure that signatures are valid and the chain has been built succesfully.
 //But the method below will say its valid if atleast one path exists from leaf to root, and it can be any path
@@ -690,15 +660,28 @@ func VerifyCertificateChain(badCertChain []*BadCertificate) {
         }
 }
 
-func WriteCertificateChainPem(badCertChain []*BadCertificate, filepath string) {
-        var err error
-        
-	file, err := os.Create(filepath)
+
+func (badcert *BadCertificate) WriteCertificateDer(dest io.Writer) {
+	_, err := dest.Write(badcert.x509Certificate.Raw)
         if err != nil {
-		panic(err)
+                panic(err)
         }
-        defer file.Close()
-        
+}
+
+func (badcert *BadCertificate) WriteCertificatePem(dest io.Writer) { 
+	pemBlock := &pem.Block{
+                        Type:  "CERTIFICATE",
+                        Bytes: badcert.x509Certificate.Raw,
+                    }
+
+	err := pem.Encode(dest, pemBlock)
+	if err != nil {
+		panic(err)
+	}
+}
+
+
+func WriteCertificateChainPem(badCertChain []*BadCertificate, dest io.Writer) { 
 	for _, badcert := range badCertChain {
 
 	    pemBlock := &pem.Block{
@@ -706,7 +689,7 @@ func WriteCertificateChainPem(badCertChain []*BadCertificate, filepath string) {
                             Bytes: badcert.x509Certificate.Raw,
                         }
 
-            err = pem.Encode(file, pemBlock)
+	    err := pem.Encode(dest, pemBlock)
 	    if err != nil {
 	        	panic(err)
 	    }
