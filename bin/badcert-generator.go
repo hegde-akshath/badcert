@@ -45,4 +45,5 @@ func main() {
 	CreateOutputDirectory(*outputDirectory)
 	defaultCertificateParams = GenerateDefaultCertificateParams()
 	GenerateRFC5280Certs(*outputDirectory)
+	GenerateCustomCerts(*outputDirectory)
 }
