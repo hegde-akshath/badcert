@@ -27,7 +27,7 @@ func CreateTestCertData(badCertChain BadCertificateChain, leafPresent bool, inte
 	return &testCertData	    
 }
 
-func (testCertData *TestCertData) WriteTestCertDataJson() {
+func (testCertData *TestCertData) WriteTestCertDataJson(filepath string) {
 	var err error
 	var jsonData []byte
         var f *os.File
@@ -37,7 +37,7 @@ func (testCertData *TestCertData) WriteTestCertDataJson() {
 		panic(err)
 	}
 
-        f, err = os.Create("temp.json")
+        f, err = os.Create(filepath)
 	if err != nil {
 		panic(err)
 	}
