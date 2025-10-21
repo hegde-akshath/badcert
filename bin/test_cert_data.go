@@ -8,22 +8,29 @@ import (
 )
 
 type TestCertData struct {
-	CertChainPem string
-	LeafPresent bool
-	IntermedCAPresent bool
+	CACertChainPem string
+	LeafCertPem string
 	IsValid bool
 }
 
-func CreateTestCertData(badCertChain BadCertificateChain, leafPresent bool, intermedCAPresent bool, isValid bool) (*TestCertData) {
+func CreateTestCertData(badCertChain BadCertificateChain, leafPresent bool, isValid bool) (*TestCertData) {
 	var testCertData TestCertData
         var buf bytes.Buffer
+        var caStartIndex int
 
-	testCertData.LeafPresent       = leafPresent
-	testCertData.IntermedCAPresent = intermedCAPresent
 	testCertData.IsValid           = isValid
-        
-	badcert.WriteCertificateChainPem([]*badcert.BadCertificate(badCertChain), &buf)
-        testCertData.CertChainPem = buf.String()
+	
+	if leafPresent {
+		badLeafCert := []*badcert.BadCertificate(badCertChain)[0]
+		badLeafCert.WriteCertificatePem(&buf)
+		testCertData.LeafCertPem = buf.String()
+		buf.Reset()
+		caStartIndex = 1
+	}
+
+	badcert.WriteCertificateChainPem([]*badcert.BadCertificate(badCertChain)[caStartIndex:], &buf)
+        testCertData.CACertChainPem = buf.String()
+	buf.Reset()
 	return &testCertData	    
 }
 
