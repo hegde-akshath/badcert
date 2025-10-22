@@ -19,17 +19,17 @@ func X509_VERSION_1(outputDirectory string) {
 	badRootCARecipe      = BuildDefaultRootCARecipe().SetVersion1()
         badIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetVersion1()
         badLeafRecipe        = BuildDefaultLeafRecipe().SetVersion1()
-	badCertificateChains := BuildBadCertificateChains(badRootCARecipe, badIntermed1CARecipe, badLeafRecipe)
+	badCertificateChains := BuildBadCertificateChains(badRootCARecipe, badIntermed1CARecipe, badLeafRecipe, " ")
 	for index, badCertificateChain = range *badCertificateChains {
-		CreateAndWriteBadCertChain(badCertificateChain, fmt.Sprintf("%s/X509-VERSION-1-CAT1-%d.pem", outputDirectory, index))
+		WriteBadCertChain(badCertificateChain, fmt.Sprintf("%s/X509-VERSION-1-CAT1-%d.pem", outputDirectory, index))
 	}
 
 	badRootCARecipe      = BuildDefaultRootCARecipe().SetVersion2()
         badIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetVersion2()
         badLeafRecipe        = BuildDefaultLeafRecipe().SetVersion2()
-	badCertificateChains = BuildBadCertificateChains(badRootCARecipe, badIntermed1CARecipe, badLeafRecipe)
+	badCertificateChains = BuildBadCertificateChains(badRootCARecipe, badIntermed1CARecipe, badLeafRecipe, " ")
 	for index, badCertificateChain = range *badCertificateChains {
-		CreateAndWriteBadCertChain(badCertificateChain, fmt.Sprintf("%s/X509-VERSION-1-CAT2-%d.pem", outputDirectory, index))
+		WriteBadCertChain(badCertificateChain, fmt.Sprintf("%s/X509-VERSION-1-CAT2-%d.pem", outputDirectory, index))
 	}
 
 
@@ -48,9 +48,9 @@ func X509_SUBJECT_1(outputDirectory string) {
 	
 	badRootCARecipe      = BuildDefaultRootCARecipe().SetSubject(emptySubject)
         badIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetSubject(emptySubject)
-	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe)
+	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, " ")
 	for index, badCertificateChain = range *badCertificateChains {
-		CreateAndWriteBadCertChain(badCertificateChain, fmt.Sprintf("%s/X509-SUBJECT-1-CAT1-%d.pem", outputDirectory, index))
+		WriteBadCertChain(badCertificateChain, fmt.Sprintf("%s/X509-SUBJECT-1-CAT1-%d.pem", outputDirectory, index))
 	}
 }
 
@@ -59,7 +59,7 @@ func X509_SUBJECT_2(outputDirectory string) {
         var goodRootCARecipe *badcert.BadCertificate
 	var goodIntermed1CARecipe *badcert.BadCertificate
 	var badLeafRecipe *badcert.BadCertificate
-        var certChain []*badcert.BadCertificate 
+        var certChain BadCertificateChain
 	var emptySubject *pkix.Name
         	
 	emptySubject = &pkix.Name{}
@@ -70,8 +70,8 @@ func X509_SUBJECT_2(outputDirectory string) {
 	goodRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
         goodIntermed1CARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
 	badLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-        certChain = CreateBadCertificateChain(badLeafRecipe, goodIntermed1CARecipe, goodRootCARecipe)
-	CreateAndWriteBadCertChain(certChain, fmt.Sprintf("%s/X509-SUBJECT-2-CAT1-1.pem", outputDirectory))
+        certChain = CreateBadCertificateChain(" ", defaultCertificateParams.LeafKey, true, true, false, badLeafRecipe, goodIntermed1CARecipe, goodRootCARecipe)
+	WriteBadCertChain(certChain, fmt.Sprintf("%s/X509-SUBJECT-2-CAT1-1.pem", outputDirectory))
 }
 
 
@@ -90,9 +90,9 @@ func X509_EXT_BASIC_CONST_1(outputDirectory string) {
         badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetBasicConstraintsExtension().SetBasicConstraintsExtension(true, false, 0, false)
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
-	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe)
+	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, " ")
 	for index, badCertificateChain := range *badCertificateChains {
-		CreateAndWriteBadCertChain(badCertificateChain, fmt.Sprintf("%s/X509-EXT-BASIC-CONST-1-CAT1-%d.pem", outputDirectory, index))
+		WriteBadCertChain(badCertificateChain, fmt.Sprintf("%s/X509-EXT-BASIC-CONST-1-CAT1-%d.pem", outputDirectory, index))
 	}
 }
 
@@ -111,10 +111,10 @@ func X509_EXT_BASIC_CONST_2(outputDirectory string) {
 	badRootCARecipe.SetExtensions(modifiedRootCAExtensions)
         badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetBasicConstraintsExtension()
-	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
-	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe)
+	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions) 
+	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, " ")
 	for index, badCertificateChain = range *badCertificateChains {
-		CreateAndWriteBadCertChain(badCertificateChain, fmt.Sprintf("%s/X509-EXT-BASIC-CONST-2-CAT1-%d.pem", outputDirectory, index))
+		WriteBadCertChain(badCertificateChain, fmt.Sprintf("%s/X509-EXT-BASIC-CONST-2-CAT1-%d.pem", outputDirectory, index))
 	}
 
 	badRootCARecipe      = BuildDefaultRootCARecipe()
@@ -123,9 +123,9 @@ func X509_EXT_BASIC_CONST_2(outputDirectory string) {
         badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetBasicConstraintsExtension().SetBasicConstraintsExtension(true, false, 0, false)
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
-	badCertificateChains = BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe)
+	badCertificateChains = BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, " ")
 	for index, badCertificateChain = range *badCertificateChains {
-		CreateAndWriteBadCertChain(badCertificateChain, fmt.Sprintf("%s/X509-EXT-BASIC-CONST-2-CAT2-%d.pem", outputDirectory, index))
+		WriteBadCertChain(badCertificateChain, fmt.Sprintf("%s/X509-EXT-BASIC-CONST-2-CAT2-%d.pem", outputDirectory, index))
 	}
 }
 
@@ -147,9 +147,9 @@ func X509_EXT_BASIC_CONST_3(outputDirectory string) {
         badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetBasicConstraintsExtension()
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
-	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe)
+	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, " ")
 	for index, badCertificateChain = range *badCertificateChains {
-		CreateAndWriteBadCertChain(badCertificateChain, fmt.Sprintf("%s/X509-EXT-BASIC-CONST-3-CAT1-%d.pem", outputDirectory, index))
+		WriteBadCertChain(badCertificateChain, fmt.Sprintf("%s/X509-EXT-BASIC-CONST-3-CAT1-%d.pem", outputDirectory, index))
 	}
 
 	badRootCARecipe      = BuildDefaultRootCARecipe()
@@ -158,9 +158,9 @@ func X509_EXT_BASIC_CONST_3(outputDirectory string) {
         badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetBasicConstraintsExtension().SetBasicConstraintsExtension(false, true, 0, false)
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
-	badCertificateChains = BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe)
+	badCertificateChains = BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, " ")
 	for index, badCertificateChain = range *badCertificateChains {
-		CreateAndWriteBadCertChain(badCertificateChain, fmt.Sprintf("%s/X509-EXT-BASIC-CONST-3-CAT2-%d.pem", outputDirectory, index))
+		WriteBadCertChain(badCertificateChain, fmt.Sprintf("%s/X509-EXT-BASIC-CONST-3-CAT2-%d.pem", outputDirectory, index))
 	}
 }
 
@@ -173,7 +173,7 @@ func X509_EXT_BASIC_CONST_5(outputDirectory string) {
 	var goodIntermed1CARecipe *badcert.BadCertificate
 	var goodLeafRecipe *badcert.BadCertificate
 	var modifiedLeafExtensions badcert.ExtensionSlice
-        var certChain []*badcert.BadCertificate 
+        var certChain BadCertificateChain 
 			
 	goodRootCARecipe      = BuildDefaultRootCARecipe()
         goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
@@ -183,8 +183,8 @@ func X509_EXT_BASIC_CONST_5(outputDirectory string) {
 	goodRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
         goodIntermed1CARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
 	goodLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-        certChain = CreateBadCertificateChain(goodLeafRecipe, goodIntermed1CARecipe, goodRootCARecipe)
-	CreateAndWriteBadCertChain(certChain, fmt.Sprintf("%s/X509-EXT-BASIC-CONST-5-CAT1-1.pem", outputDirectory))
+        certChain = CreateBadCertificateChain(" ", defaultCertificateParams.LeafKey, true, true, true, goodLeafRecipe, goodIntermed1CARecipe, goodRootCARecipe)
+	WriteBadCertChain(certChain, fmt.Sprintf("%s/X509-EXT-BASIC-CONST-5-CAT1-1.pem", outputDirectory))
 
 	goodRootCARecipe      = BuildDefaultRootCARecipe()
         goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
@@ -194,8 +194,8 @@ func X509_EXT_BASIC_CONST_5(outputDirectory string) {
 	goodRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
         goodIntermed1CARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
 	goodLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-        certChain = CreateBadCertificateChain(goodLeafRecipe, goodIntermed1CARecipe, goodRootCARecipe)
-	CreateAndWriteBadCertChain(certChain, fmt.Sprintf("%s/X509-EXT-BASIC-CONST-5-CAT2-1.pem", outputDirectory))
+        certChain = CreateBadCertificateChain(" ", defaultCertificateParams.LeafKey, true, true, true, goodLeafRecipe, goodIntermed1CARecipe, goodRootCARecipe)
+	WriteBadCertChain(certChain, fmt.Sprintf("%s/X509-EXT-BASIC-CONST-5-CAT2-1.pem", outputDirectory))
 }
 
 
@@ -215,9 +215,9 @@ func X509_EXT_BASIC_CONST_6(outputDirectory string) {
         badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetBasicConstraintsExtension().SetBasicConstraintsExtension(true, false, 0, false)
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
-	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe)
+	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, " ")
 	for index, badCertificateChain = range *badCertificateChains {
-		CreateAndWriteBadCertChain(badCertificateChain, fmt.Sprintf("%s/X509-EXT-BASIC-CONST-6-CAT1-%d.pem", outputDirectory, index))
+		WriteBadCertChain(badCertificateChain, fmt.Sprintf("%s/X509-EXT-BASIC-CONST-6-CAT1-%d.pem", outputDirectory, index))
 	}
 
 	badRootCARecipe      = BuildDefaultRootCARecipe()
@@ -226,9 +226,9 @@ func X509_EXT_BASIC_CONST_6(outputDirectory string) {
         badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetKeyUsageExtension().SetKeyUsageExtension(false, badcert.KeyUsageEncipherOnly)
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
-	badCertificateChains = BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe)
+	badCertificateChains = BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, " ")
 	for index, badCertificateChain = range *badCertificateChains {
-		CreateAndWriteBadCertChain(badCertificateChain, fmt.Sprintf("%s/X509-EXT-BASIC-CONST-6-CAT2-%d.pem", outputDirectory, index))
+		WriteBadCertChain(badCertificateChain, fmt.Sprintf("%s/X509-EXT-BASIC-CONST-6-CAT2-%d.pem", outputDirectory, index))
 	}
 }
 
@@ -247,9 +247,9 @@ func X509_EXT_BASIC_CONST_7(outputDirectory string) {
         badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetBasicConstraintsExtension().SetBasicConstraintsExtension(true, true, -2, false)
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
-	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe)
+	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, "")
 	for index, badCertificateChain = range *badCertificateChains {
-		CreateAndWriteBadCertChain(badCertificateChain, fmt.Sprintf("%s/X509-EXT-BASIC-CONST-7-CAT1-%d.pem", outputDirectory, index))
+		WriteBadCertChain(badCertificateChain, fmt.Sprintf("%s/X509-EXT-BASIC-CONST-7-CAT1-%d.pem", outputDirectory, index))
 	}
 }
 
@@ -262,7 +262,7 @@ func X509_EXT_SAN_1(outputDirectory string) {
 	var goodIntermed1CARecipe *badcert.BadCertificate
 	var goodLeafRecipe *badcert.BadCertificate
 	var modifiedLeafExtensions badcert.ExtensionSlice
-        var certChain []*badcert.BadCertificate 
+        var certChain BadCertificateChain
 		
 	goodRootCARecipe      = BuildDefaultRootCARecipe()
         goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
@@ -272,8 +272,8 @@ func X509_EXT_SAN_1(outputDirectory string) {
 	goodRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
         goodIntermed1CARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
 	goodLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-        certChain = CreateBadCertificateChain(goodLeafRecipe, goodIntermed1CARecipe, goodRootCARecipe)
-	CreateAndWriteBadCertChain(certChain, fmt.Sprintf("%s/X509-EXT-SAN-1-CAT1-1.pem", outputDirectory))
+        certChain = CreateBadCertificateChain("", defaultCertificateParams.LeafKey, true, true, true, goodLeafRecipe, goodIntermed1CARecipe, goodRootCARecipe)
+	WriteBadCertChain(certChain, fmt.Sprintf("%s/X509-EXT-SAN-1-CAT1-1.pem", outputDirectory))
 	
         goodRootCARecipe      = BuildDefaultRootCARecipe()
         goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
@@ -283,8 +283,8 @@ func X509_EXT_SAN_1(outputDirectory string) {
 	goodRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
         goodIntermed1CARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
 	goodLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-        certChain = CreateBadCertificateChain(goodLeafRecipe, goodIntermed1CARecipe, goodRootCARecipe)
-	CreateAndWriteBadCertChain(certChain, fmt.Sprintf("%s/X509-EXT-SAN-1-CAT1-2.pem", outputDirectory))
+        certChain = CreateBadCertificateChain("", defaultCertificateParams.LeafKey, true, true, true, goodLeafRecipe, goodIntermed1CARecipe, goodRootCARecipe)
+	WriteBadCertChain(certChain, fmt.Sprintf("%s/X509-EXT-SAN-1-CAT1-2.pem", outputDirectory))
 }
 
 func GenerateX509VersionCerts(outputDirectory string) {

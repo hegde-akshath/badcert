@@ -39,9 +39,9 @@ func CUSTOM_CERT_1(outputDirectory string) {
 	badRootCARecipe      = BuildDefaultRootCARecipe().SetVersion1()
         badIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetVersion1()
         badLeafRecipe        = BuildDefaultLeafRecipe().SetVersion1()
-	badCertificateChains := BuildBadCertificateChains(badRootCARecipe, badIntermed1CARecipe, badLeafRecipe)
+	badCertificateChains := BuildBadCertificateChains(badRootCARecipe, badIntermed1CARecipe, badLeafRecipe, " ")
 	for index, badCertificateChain = range *badCertificateChains {
-	        testCertData := CreateTestCertData(badCertificateChain, true, false)
+	        testCertData := CreateTestCertData(badCertificateChain)
                 testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CUSTOM-CERT-1-CAT1-%d.json", outputDirectory, index))
 	}
 }
@@ -67,9 +67,9 @@ func CUSTOM_CERT_2(outputDirectory string) {
 	badRootCARecipe      = BuildDefaultRootCARecipe().SetVersion2()
         badIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetVersion2()
         badLeafRecipe        = BuildDefaultLeafRecipe().SetVersion2()
-	badCertificateChains := BuildBadCertificateChains(badRootCARecipe, badIntermed1CARecipe, badLeafRecipe)
+	badCertificateChains := BuildBadCertificateChains(badRootCARecipe, badIntermed1CARecipe, badLeafRecipe, " ")
 	for index, badCertificateChain = range *badCertificateChains {
-		testCertData := CreateTestCertData(badCertificateChain, true, false)
+		testCertData := CreateTestCertData(badCertificateChain)
                 testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CUSTOM-CERT-2-CAT1-%d.json", outputDirectory, index))
 	}
 }
@@ -97,9 +97,9 @@ func CUSTOM_CERT_3(outputDirectory string) {
         badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetBasicConstraintsExtension()
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
-	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe)
+	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, " ")
 	for index, badCertificateChain = range *badCertificateChains {
-                testCertData := CreateTestCertData(badCertificateChain, true, false)
+                testCertData := CreateTestCertData(badCertificateChain)
                 testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CUSTOM-CERT-3-CAT1-%d.json", outputDirectory, index))	
 	}
 }
@@ -129,9 +129,9 @@ func CUSTOM_CERT_4(outputDirectory string) {
         badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetBasicConstraintsExtension().SetBasicConstraintsExtension(false, true, 0, false)
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
-	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe)
+	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, " ")
 	for index, badCertificateChain = range *badCertificateChains {
-	        testCertData := CreateTestCertData(badCertificateChain, true, false)
+	        testCertData := CreateTestCertData(badCertificateChain)
                 testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CUSTOM-CERT-4-CAT1-%d.json", outputDirectory, index))	
 	}
 }
@@ -161,9 +161,9 @@ func CUSTOM_CERT_5(outputDirectory string) {
         badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetBasicConstraintsExtension().SetBasicConstraintsExtension(true, false, 0, false)
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
-	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe)
+	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, " ")
 	for index, badCertificateChain = range *badCertificateChains {
-	        testCertData := CreateTestCertData(badCertificateChain, true, false)
+	        testCertData := CreateTestCertData(badCertificateChain)
                 testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CUSTOM-CERT-5-CAT1-%d.json", outputDirectory, index))	
 	}
 }
@@ -192,9 +192,9 @@ func CUSTOM_CERT_6(outputDirectory string) {
         badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetBasicConstraintsExtension().SetBasicConstraintsExtension(true, true, 0, false)
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
-	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe)
+	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, " ")
 	for index, badCertificateChain = range *badCertificateChains {
-	        testCertData := CreateTestCertData(badCertificateChain, true, false)
+	        testCertData := CreateTestCertData(badCertificateChain)
                 testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CUSTOM-CERT-6-CAT1-%d.json", outputDirectory, index))	
 	}
 }
@@ -224,9 +224,9 @@ func CUSTOM_CERT_7(outputDirectory string) {
         badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetBasicConstraintsExtension().SetBasicConstraintsExtension(true, true, -2, false)
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
-	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe)
+	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, " ")
 	for index, badCertificateChain = range *badCertificateChains {
-	        testCertData := CreateTestCertData(badCertificateChain, true, false)
+	        testCertData := CreateTestCertData(badCertificateChain)
                 testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CUSTOM-CERT-7-CAT1-%d.json", outputDirectory, index))	
 	}
 
@@ -255,9 +255,9 @@ func CUSTOM_CERT_8(outputDirectory string) {
         badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetKeyUsageExtension()
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
-	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe)
+	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, " ")
 	for index, badCertificateChain = range *badCertificateChains {
-	        testCertData := CreateTestCertData(badCertificateChain, true, false)
+	        testCertData := CreateTestCertData(badCertificateChain)
                 testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CUSTOM-CERT-8-CAT1-%d.json", outputDirectory, index))	
 	}
 }
@@ -287,9 +287,9 @@ func CUSTOM_CERT_9(outputDirectory string) {
         badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetKeyUsageExtension().SetKeyUsageExtension(false, badcert.KeyUsageDigitalSignature|badcert.KeyUsageCertSign|badcert.KeyUsageCRLSign)
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
-	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe)
+	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, " ")
 	for index, badCertificateChain = range *badCertificateChains {
-	        testCertData := CreateTestCertData(badCertificateChain, true, false)
+	        testCertData := CreateTestCertData(badCertificateChain)
                 testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CUSTOM-CERT-9-CAT1-%d.json", outputDirectory, index))	
 	}
 }
@@ -319,9 +319,9 @@ func CUSTOM_CERT_10(outputDirectory string) {
         badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetKeyUsageExtension().SetKeyUsageExtension(true, badcert.KeyUsageDigitalSignature|badcert.KeyUsageCRLSign)
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
-	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe)
+	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, " ")
 	for index, badCertificateChain = range *badCertificateChains {
-	        testCertData := CreateTestCertData(badCertificateChain, true, false)
+	        testCertData := CreateTestCertData(badCertificateChain)
                 testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CUSTOM-CERT-10-CAT1-%d.json", outputDirectory, index))	
 	}
 }

@@ -2,35 +2,62 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"github.com/hegde-akshath/badcert"
 	"os"
 	"encoding/json"
+	"encoding/pem"
 )
 
 type TestCertData struct {
-	CACertChainPem string
+	CertProfileDescription string
+	LeafPrivateKey string
+	RootCACertPem string
+	IntermedCACertChainPem string
 	LeafCertPem string
-	IsValid bool
-}
+	IsRootCACertValid bool
+	IsIntermedCACertChainValid bool
+	IsLeafCertValid bool
+} 
 
-func CreateTestCertData(badCertChain BadCertificateChain, leafPresent bool, isValid bool) (*TestCertData) {
+func CreateTestCertData(badCertChain BadCertificateChain) (*TestCertData) {
 	var testCertData TestCertData
         var buf bytes.Buffer
-        var caStartIndex int
 
-	testCertData.IsValid           = isValid
+	certChainLength := len(badCertChain.Chain)
 	
-	if leafPresent {
-		badLeafCert := []*badcert.BadCertificate(badCertChain)[0]
-		badLeafCert.WriteCertificatePem(&buf)
-		testCertData.LeafCertPem = buf.String()
-		buf.Reset()
-		caStartIndex = 1
+	if certChainLength < 1 {
+		panic(errors.New("Only a single cert present in chain"))
 	}
-
-	badcert.WriteCertificateChainPem([]*badcert.BadCertificate(badCertChain)[caStartIndex:], &buf)
-        testCertData.CACertChainPem = buf.String()
+        
+	privateKeyBytes := badcert.MarshalPKCS1PrivateKey(badCertChain.LeafPrivateKey)
+        privateKeyPEM := &pem.Block{
+                           Type:  "RSA PRIVATE KEY",
+                           Bytes: privateKeyBytes,
+        }
+        pem.Encode(&buf, privateKeyPEM)
+	testCertData.LeafPrivateKey = buf.String()
 	buf.Reset()
+
+	badLeafCert := badCertChain.Chain[0]
+	badLeafCert.WriteCertificatePem(&buf)
+	testCertData.LeafCertPem = buf.String()
+	buf.Reset()
+        
+	badcert.WriteCertificateChainPem(badCertChain.Chain[1:(certChainLength - 1)], &buf)
+        testCertData.IntermedCACertChainPem = buf.String()
+	buf.Reset()
+        
+	rootCACert := badCertChain.Chain[certChainLength - 1]
+        rootCACert.WriteCertificatePem(&buf)
+	testCertData.RootCACertPem = buf.String()
+	buf.Reset()
+         
+	testCertData.IsRootCACertValid          = badCertChain.IsRootCACertValid
+	testCertData.IsIntermedCACertChainValid = badCertChain.IsIntermedCACertChainValid
+	testCertData.IsLeafCertValid            = badCertChain.IsLeafCertValid 
+	testCertData.CertProfileDescription     = badCertChain.CertProfileDescription 
+
 	return &testCertData	    
 }
 
