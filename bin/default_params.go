@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto"
 	"crypto/rsa"
 	"crypto/rand"
 	"github.com/hegde-akshath/badcert"
@@ -10,9 +11,9 @@ import (
 )
 
 type DefaultCertificateParams struct {
-	RootCAKey *rsa.PrivateKey
-	Intermed1CAKey *rsa.PrivateKey
-        LeafKey *rsa.PrivateKey
+	RootCAKey crypto.PrivateKey
+	Intermed1CAKey crypto.PrivateKey
+        LeafKey crypto.PrivateKey
 	RootCAName *pkix.Name
 	Intermed1CAName *pkix.Name
 	LeafName *pkix.Name

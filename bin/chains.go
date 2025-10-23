@@ -1,15 +1,15 @@
 package main
 
 import (
+	"crypto"
 	"os"
 	"fmt"
 	"github.com/hegde-akshath/badcert"
-	"crypto/rsa"
 )
 
 type BadCertificateChain struct {
 	CertProfileDescription string
-	LeafPrivateKey *rsa.PrivateKey
+	LeafPrivateKey crypto.PrivateKey
 	IsRootCACertValid bool
 	IsIntermedCACertChainValid bool
 	IsLeafCertValid bool
@@ -34,7 +34,7 @@ func GenerateCertificateProfileDescription(certProfileBaseDescription string, is
 	       boolToString[isIntermedCACertChainValid], boolToString[isLeafCertValid])
 }
 
-func CreateBadCertificateChain(certProfileDescription string, leafPrivateKey *rsa.PrivateKey, isRootCACertValid bool, isIntermedCACertChainValid bool, isLeafCertValid bool, certs...*badcert.BadCertificate) (BadCertificateChain) {
+func CreateBadCertificateChain(certProfileDescription string, leafPrivateKey crypto.PrivateKey, isRootCACertValid bool, isIntermedCACertChainValid bool, isLeafCertValid bool, certs...*badcert.BadCertificate) (BadCertificateChain) {
 	var badCertChain BadCertificateChain
 
 	badCertChain.Chain = make([]*badcert.BadCertificate, 0, len(certs))

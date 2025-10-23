@@ -30,9 +30,13 @@ func CreateTestCertData(badCertChain BadCertificateChain) (*TestCertData) {
 		panic(errors.New("Only a single cert present in chain"))
 	}
         
-	privateKeyBytes := badcert.MarshalPKCS1PrivateKey(badCertChain.LeafPrivateKey)
+	privateKeyBytes, err := badcert.MarshalPKCS8PrivateKey(badCertChain.LeafPrivateKey)
+	if err != nil {
+		panic(err)
+	}
+
         privateKeyPEM := &pem.Block{
-                           Type:  "RSA PRIVATE KEY",
+                           Type:  "PRIVATE KEY",
                            Bytes: privateKeyBytes,
         }
         pem.Encode(&buf, privateKeyPEM)

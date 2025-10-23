@@ -25,13 +25,16 @@ import (
 	"io"
 	"crypto/rand"
 	"crypto/rsa"
+	"crypto/ecdsa"
+	"crypto/ed25519"
 	"github.com/hegde-akshath/badcert/pkix"
 	"encoding/asn1"
 	"encoding/pem"
 	"math/big"
 	"time"
 	"errors"
-
+        
+	"crypto"
 	"crypto/sha256"
 	"crypto/sha1"
 	"net"
@@ -53,6 +56,26 @@ const (
 )
 
 type ExtensionSlice []pkix.Extension
+
+func getSignerFromKey(privKey crypto.PrivateKey) (crypto.Signer, crypto.PublicKey) {
+	var signer crypto.Signer
+        var publicKey crypto.PublicKey
+
+	switch privKeyType := privKey.(type) {
+	case *rsa.PrivateKey:
+		signer = privKeyType
+		publicKey = signer.Public()
+        case *ecdsa.PrivateKey:
+		signer = privKeyType
+		publicKey = signer.Public()
+        case ed25519.PrivateKey:
+                signer = privKeyType
+		publicKey = signer.Public()
+        default:
+	        panic(fmt.Errorf("Unknown private key type: %T", privKeyType))
+        }
+	return signer, publicKey
+}
 
 type BadCertValidity struct {
 	NotBefore time.Time
@@ -79,10 +102,12 @@ func GetRandomBytes(length int) ([]byte, error) {
 }
 
 
-func GenerateKeyIdFromKey(privKey *rsa.PrivateKey) ([]byte) {
+func GenerateKeyIdFromKey(privKey crypto.PrivateKey) ([]byte) {
         var keyId []byte
+        var pubKey crypto.PublicKey
 
-	pubKey := &privKey.PublicKey
+	_, pubKey = getSignerFromKey(privKey)
+
         keyidMethod := 1
         
 	pubKeyBytes, _, err := marshalPublicKey(pubKey)
@@ -260,10 +285,13 @@ func (tbsCert *tbsCertificate) SetValidity(notBefore *time.Time, notAfter *time.
 	return tbsCert
 }
 
-func (tbsCert *tbsCertificate) SetCertificatePublicKey(privKey *rsa.PrivateKey, signatureAlgorithm SignatureAlgorithm) (*tbsCertificate) {
-	pubKey := &privKey.PublicKey
+func (tbsCert *tbsCertificate) SetCertificatePublicKey(privKey crypto.PrivateKey, signatureAlgorithm SignatureAlgorithm) (*tbsCertificate) {
+	var signer crypto.Signer
+        var pubKey crypto.PublicKey
+
+	signer, pubKey = getSignerFromKey(privKey)
 	
-	signatureAlgorithm, algorithmIdentifier, err := signingParamsForKey(privKey, signatureAlgorithm)
+	signatureAlgorithm, algorithmIdentifier, err := signingParamsForKey(signer, signatureAlgorithm)
 	if err != nil {
 		panic(err)
 	}
@@ -400,7 +428,7 @@ func (extensions ExtensionSlice) SetAKIDExtension(critical bool, authorityKeyId 
 	return((ExtensionSlice)(modifiedExtensions))
 }
 
-func (extensions ExtensionSlice) SetAKIDExtensionFromKey(critical bool, privKey *rsa.PrivateKey)(ExtensionSlice) {
+func (extensions ExtensionSlice) SetAKIDExtensionFromKey(critical bool, privKey crypto.PrivateKey)(ExtensionSlice) {
 	authorityKeyId := GenerateKeyIdFromKey(privKey)
 	return(extensions.SetAKIDExtension(critical, authorityKeyId))
 }
@@ -430,7 +458,7 @@ func (extensions ExtensionSlice) SetSKIDExtension(critical bool, subjectKeyId []
 	return((ExtensionSlice)(modifiedExtensions))
 }
 
-func (extensions ExtensionSlice) SetSKIDExtensionFromKey(critical bool, privKey *rsa.PrivateKey)(ExtensionSlice) {
+func (extensions ExtensionSlice) SetSKIDExtensionFromKey(critical bool, privKey crypto.PrivateKey)(ExtensionSlice) {
 	subjectKeyId := GenerateKeyIdFromKey(privKey)
 	return(extensions.SetSKIDExtension(critical, subjectKeyId))
 }
@@ -588,14 +616,18 @@ func (badcert *BadCertificate) GetExtensions() (extensions ExtensionSlice) {
         return(badcert.tbscert.GetExtensions())
 }
 
-func (badcert *BadCertificate) SetCertificatePublicKey(privKey *rsa.PrivateKey, signatureAlgorithm SignatureAlgorithm) (*BadCertificate) {
+func (badcert *BadCertificate) SetCertificatePublicKey(privKey crypto.PrivateKey, signatureAlgorithm SignatureAlgorithm) (*BadCertificate) {
 	badcert.tbscert = badcert.tbscert.SetCertificatePublicKey(privKey, signatureAlgorithm)
 	return badcert
 }
 
 
-func (badcert *BadCertificate) SignTBS(privKey *rsa.PrivateKey, signatureAlgorithm SignatureAlgorithm) (*BadCertificate) {
-        signatureAlgorithm, algorithmIdentifier, err := signingParamsForKey(privKey, signatureAlgorithm)
+
+
+func (badcert *BadCertificate) SignTBS(privKey crypto.PrivateKey, signatureAlgorithm SignatureAlgorithm) (*BadCertificate) { 
+	signer, _ := getSignerFromKey(privKey)
+
+        signatureAlgorithm, algorithmIdentifier, err := signingParamsForKey(signer, signatureAlgorithm)
 	if err != nil {
 		panic(err)
 	}
@@ -606,7 +638,7 @@ func (badcert *BadCertificate) SignTBS(privKey *rsa.PrivateKey, signatureAlgorit
 	}
         badcert.tbscert.Raw = tbsCertContents
 
-	signature, err := signTBS(tbsCertContents, privKey, signatureAlgorithm, rand.Reader)
+	signature, err := signTBS(tbsCertContents, signer, signatureAlgorithm, rand.Reader)
 	if err != nil {
 		panic(err)
 	}
