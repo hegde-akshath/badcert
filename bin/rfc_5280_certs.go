@@ -308,11 +308,12 @@ func GenerateSANCerts(outputDirectory string) {
         X509_EXT_SAN_1(outputDirectory)
 }
 
-func GenerateRFC5280Certs(outputDirectory string) {
-	GenerateX509VersionCerts(outputDirectory)
-	GenerateX509SubjectCerts(outputDirectory)
-	GenerateX509ExtBasicConstCerts(outputDirectory)
-	GenerateSANCerts(outputDirectory)
+func GenerateRFC5280Certs(rfc5280CertOutputDirectory string) {
+	CreateDirectory(rfc5280CertOutputDirectory)
+	GenerateX509VersionCerts(rfc5280CertOutputDirectory)
+	GenerateX509SubjectCerts(rfc5280CertOutputDirectory)
+	GenerateX509ExtBasicConstCerts(rfc5280CertOutputDirectory)
+	GenerateSANCerts(rfc5280CertOutputDirectory)
 }
 
 

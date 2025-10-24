@@ -328,15 +328,16 @@ func CUSTOM_CERT_10(outputDirectory string) {
 
 
 
-func GenerateCustomCerts(outputDirectory string) {
-	CUSTOM_CERT_1(outputDirectory)
-	CUSTOM_CERT_2(outputDirectory)
-	CUSTOM_CERT_3(outputDirectory)
-	CUSTOM_CERT_4(outputDirectory)
-	CUSTOM_CERT_5(outputDirectory)
-	CUSTOM_CERT_6(outputDirectory)
-	CUSTOM_CERT_7(outputDirectory)
-	CUSTOM_CERT_8(outputDirectory)
-	CUSTOM_CERT_9(outputDirectory)
-	CUSTOM_CERT_10(outputDirectory)
+func GenerateCustomCerts(customCertOutputDirectory string) {
+	CreateDirectory(customCertOutputDirectory)
+	CUSTOM_CERT_1(customCertOutputDirectory)
+	CUSTOM_CERT_2(customCertOutputDirectory)
+	CUSTOM_CERT_3(customCertOutputDirectory)
+	CUSTOM_CERT_4(customCertOutputDirectory)
+	CUSTOM_CERT_5(customCertOutputDirectory)
+	CUSTOM_CERT_6(customCertOutputDirectory)
+	CUSTOM_CERT_7(customCertOutputDirectory)
+	CUSTOM_CERT_8(customCertOutputDirectory)
+	CUSTOM_CERT_9(customCertOutputDirectory)
+	CUSTOM_CERT_10(customCertOutputDirectory)
 }
