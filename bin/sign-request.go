@@ -42,8 +42,8 @@ var defaultIntermed1CAName = &pkix.Name{
 
 
 func loadDefaultCAKeys(defaultCADirectoryPath string) (crypto.PrivateKey, crypto.PrivateKey) {
-	rootCAKey      := LoadKey(fmt.Sprintf("%s/root-key.pem", defaultCADirectoryPath))
-	intermed1CAKey := LoadKey(fmt.Sprintf("%s/intermediate-key.pem", defaultCADirectoryPath))
+	rootCAKey      := LoadKey(fmt.Sprintf("%s/root-ca-key.pem", defaultCADirectoryPath))
+	intermed1CAKey := LoadKey(fmt.Sprintf("%s/intermed1-ca-key.pem", defaultCADirectoryPath))
 	return rootCAKey, intermed1CAKey
 }
 
@@ -83,7 +83,7 @@ func SignRequestBadCertLeafVersion1(signRequestCertOutputDirectory string, reque
 		panic(err)
        }
        badLeaf1Recipe        := BuildDefaultLeafRecipe().SetVersion1().SetSubject(&subject).SetIssuer(&rootCACert.Subject).SetSerialNumber(serialNumber1)
-       modifiedLeaf1Extensions = badLeaf1Recipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, dnsNames, emailAddresses, ipAddresses, URIs).UnsetSKIDExtension().SetSKIDExtensionFromKey(false, rootCACert.SubjectKeyId).UnsetAKIDExtension().SetAKIDExtensionFromKey(false, certRequest.PublicKey)
+       modifiedLeaf1Extensions = badLeaf1Recipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, dnsNames, emailAddresses, ipAddresses, URIs).UnsetAKIDExtension().SetAKIDExtension(false, rootCACert.SubjectKeyId).UnsetSKIDExtension().SetSKIDExtensionFromKey(false, certRequest.PublicKey)
        badLeaf1Recipe.SetExtensions(modifiedLeaf1Extensions)
        badLeaf1Recipe.SignTBS(rootCAKey, defaultCertificateParams.SignatureAlgorithm)
        certChain1 := CreateBadCertificateChain(" ", nil, true, true, false, badLeaf1Recipe, badcert.CreateBadCertificateFromCertificate(intermed1CACert), badcert.CreateBadCertificateFromCertificate(rootCACert))
@@ -93,7 +93,7 @@ func SignRequestBadCertLeafVersion1(signRequestCertOutputDirectory string, reque
 		panic(err)
        }
        badLeaf2Recipe        := BuildDefaultLeafRecipe().SetVersion1().SetSubject(&subject).SetIssuer(&intermed1CACert.Subject).SetSerialNumber(serialNumber2)
-       modifiedLeaf2Extensions = badLeaf2Recipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, dnsNames, emailAddresses, ipAddresses, URIs).UnsetSKIDExtension().SetSKIDExtensionFromKey(false, intermed1CACert.SubjectKeyId).UnsetAKIDExtension().SetAKIDExtensionFromKey(false, certRequest.PublicKey)
+       modifiedLeaf2Extensions = badLeaf2Recipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, dnsNames, emailAddresses, ipAddresses, URIs).UnsetAKIDExtension().SetAKIDExtension(false, intermed1CACert.SubjectKeyId).UnsetSKIDExtension().SetSKIDExtensionFromKey(false, certRequest.PublicKey)
        badLeaf2Recipe.SetExtensions(modifiedLeaf2Extensions) 
        badLeaf2Recipe.SignTBS(intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
        certChain2 := CreateBadCertificateChain(" ", nil, true, true, false, badLeaf2Recipe, badcert.CreateBadCertificateFromCertificate(intermed1CACert), badcert.CreateBadCertificateFromCertificate(rootCACert))
@@ -131,7 +131,7 @@ func SignRequestBadCertLeafVersion2(signRequestCertOutputDirectory string, reque
 		panic(err)
        }
        badLeaf1Recipe        := BuildDefaultLeafRecipe().SetVersion2().SetSubject(&subject).SetIssuer(&rootCACert.Subject).SetSerialNumber(serialNumber1)
-       modifiedLeaf1Extensions = badLeaf1Recipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, dnsNames, emailAddresses, ipAddresses, URIs).UnsetSKIDExtension().SetSKIDExtensionFromKey(false, rootCACert.SubjectKeyId).UnsetAKIDExtension().SetAKIDExtensionFromKey(false, certRequest.PublicKey)
+       modifiedLeaf1Extensions = badLeaf1Recipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, dnsNames, emailAddresses, ipAddresses, URIs).UnsetAKIDExtension().SetAKIDExtension(false, rootCACert.SubjectKeyId).UnsetSKIDExtension().SetSKIDExtensionFromKey(false, certRequest.PublicKey)
        badLeaf1Recipe.SetExtensions(modifiedLeaf1Extensions)
        badLeaf1Recipe.SignTBS(rootCAKey, defaultCertificateParams.SignatureAlgorithm)
        certChain1 := CreateBadCertificateChain(" ", nil, true, true, false, badLeaf1Recipe, badcert.CreateBadCertificateFromCertificate(intermed1CACert), badcert.CreateBadCertificateFromCertificate(rootCACert))
@@ -141,7 +141,7 @@ func SignRequestBadCertLeafVersion2(signRequestCertOutputDirectory string, reque
 		panic(err)
        }
        badLeaf2Recipe        := BuildDefaultLeafRecipe().SetVersion2().SetSubject(&subject).SetIssuer(&intermed1CACert.Subject).SetSerialNumber(serialNumber2)
-       modifiedLeaf2Extensions = badLeaf2Recipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, dnsNames, emailAddresses, ipAddresses, URIs).UnsetSKIDExtension().SetSKIDExtensionFromKey(false, intermed1CACert.SubjectKeyId).UnsetAKIDExtension().SetAKIDExtensionFromKey(false, certRequest.PublicKey)
+       modifiedLeaf2Extensions = badLeaf2Recipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, dnsNames, emailAddresses, ipAddresses, URIs).UnsetAKIDExtension().SetAKIDExtension(false, intermed1CACert.SubjectKeyId).UnsetSKIDExtension().SetSKIDExtensionFromKey(false, certRequest.PublicKey)
        badLeaf2Recipe.SetExtensions(modifiedLeaf2Extensions) 
        badLeaf2Recipe.SignTBS(intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
        certChain2 := CreateBadCertificateChain(" ", nil, true, true, false, badLeaf2Recipe, badcert.CreateBadCertificateFromCertificate(intermed1CACert), badcert.CreateBadCertificateFromCertificate(rootCACert))
@@ -149,7 +149,7 @@ func SignRequestBadCertLeafVersion2(signRequestCertOutputDirectory string, reque
        badCertificateChains := CreateBadCertificateChains(certChain1, certChain2)
        for index, badCertificateChain := range badCertificateChains {
                 testCertData := CreateTestCertData(badCertificateChain)
-                testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/LEAF-CERT-VERSION-1-%d.json", signRequestCertOutputDirectory, index))
+                testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/LEAF-CERT-VERSION-2-%d.json", signRequestCertOutputDirectory, index))
        }
 }
 

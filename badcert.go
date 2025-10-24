@@ -57,7 +57,7 @@ const (
 
 type ExtensionSlice []pkix.Extension
 
-func getSignerFromKey(privKey crypto.PrivateKey) (crypto.Signer, crypto.PublicKey) {
+func GetSignerFromKey(privKey crypto.PrivateKey) (crypto.Signer, crypto.PublicKey) {
 	var signer crypto.Signer
         var publicKey crypto.PublicKey
 
@@ -102,11 +102,8 @@ func GetRandomBytes(length int) ([]byte, error) {
 }
 
 
-func GenerateKeyIdFromKey(privKey crypto.PrivateKey) ([]byte) {
+func GenerateKeyIdFromKey(pubKey crypto.PublicKey) ([]byte) {
         var keyId []byte
-        var pubKey crypto.PublicKey
-
-	_, pubKey = getSignerFromKey(privKey)
 
         keyidMethod := 1
         
@@ -302,7 +299,7 @@ func (tbsCert *tbsCertificate) SetCertificatePublicKey(privKey crypto.PrivateKey
 	var signer crypto.Signer
         var pubKey crypto.PublicKey
 
-	signer, pubKey = getSignerFromKey(privKey)
+	signer, pubKey = GetSignerFromKey(privKey)
 	
 	signatureAlgorithm, algorithmIdentifier, err := signingParamsForKey(signer, signatureAlgorithm)
 	if err != nil {
@@ -441,8 +438,8 @@ func (extensions ExtensionSlice) SetAKIDExtension(critical bool, authorityKeyId 
 	return((ExtensionSlice)(modifiedExtensions))
 }
 
-func (extensions ExtensionSlice) SetAKIDExtensionFromKey(critical bool, privKey crypto.PrivateKey)(ExtensionSlice) {
-	authorityKeyId := GenerateKeyIdFromKey(privKey)
+func (extensions ExtensionSlice) SetAKIDExtensionFromKey(critical bool, pubKey crypto.PublicKey)(ExtensionSlice) {
+	authorityKeyId := GenerateKeyIdFromKey(pubKey)
 	return(extensions.SetAKIDExtension(critical, authorityKeyId))
 }
 
@@ -471,8 +468,8 @@ func (extensions ExtensionSlice) SetSKIDExtension(critical bool, subjectKeyId []
 	return((ExtensionSlice)(modifiedExtensions))
 }
 
-func (extensions ExtensionSlice) SetSKIDExtensionFromKey(critical bool, privKey crypto.PrivateKey)(ExtensionSlice) {
-	subjectKeyId := GenerateKeyIdFromKey(privKey)
+func (extensions ExtensionSlice) SetSKIDExtensionFromKey(critical bool, pubKey crypto.PublicKey)(ExtensionSlice) {
+	subjectKeyId := GenerateKeyIdFromKey(pubKey)
 	return(extensions.SetSKIDExtension(critical, subjectKeyId))
 }
 
@@ -638,7 +635,7 @@ func (badcert *BadCertificate) SetCertificatePublicKey(privKey crypto.PrivateKey
 
 
 func (badcert *BadCertificate) SignTBS(privKey crypto.PrivateKey, signatureAlgorithm SignatureAlgorithm) (*BadCertificate) { 
-	signer, _ := getSignerFromKey(privKey)
+	signer, _ := GetSignerFromKey(privKey)
 
         signatureAlgorithm, algorithmIdentifier, err := signingParamsForKey(signer, signatureAlgorithm)
 	if err != nil {
