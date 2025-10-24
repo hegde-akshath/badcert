@@ -240,6 +240,19 @@ func CreateBadCertificate() (*BadCertificate) {
 	return &BadCertificate{tbscert: &tbsCertificate{}}
 }
 
+func CreateBadCertificateFromCertificate(cert *Certificate) (*BadCertificate) {
+	var tbsCert tbsCertificate
+
+	rawTbsCert := cert.RawTBSCertificate
+
+	_, err := asn1.Unmarshal(rawTbsCert, &tbsCert)
+	if err != nil {
+		panic(err)
+	}
+        
+	return &BadCertificate{tbscert: &tbsCert, x509Certificate: cert}
+}
+
 func CreateExtensions() (ExtensionSlice) {
 	extensions := make([]pkix.Extension, 0, InitialMaxExtensions)
 	return ExtensionSlice(extensions)
