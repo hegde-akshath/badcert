@@ -455,10 +455,11 @@ func parseSANExtension(der cryptobyte.String) (dnsNames, emailAddresses []string
 
 func parseAuthorityKeyIdentifier(e pkix.Extension) ([]byte, error) {
 	// RFC 5280, Section 4.2.1.1
-	if e.Critical {
+	//NOTE: Disabling this check to deliberately allow creation of certificates with critical AKID
+	//if e.Critical {
 		// Conforming CAs MUST mark this extension as non-critical
-		return nil, errors.New("x509: authority key identifier incorrectly marked critical")
-	}
+		//return nil, errors.New("x509: authority key identifier incorrectly marked critical")
+	//}
 	val := cryptobyte.String(e.Value)
 	var akid cryptobyte.String
 	if !val.ReadASN1(&akid, cryptobyte_asn1.SEQUENCE) {
@@ -823,11 +824,13 @@ func processExtensions(out *Certificate) error {
 				if err != nil {
 					return err
 				}
-			case 14: // RFC 5280, 4.2.1.2
-				if e.Critical {
+			case 14: 
+			        // RFC 5280, 4.2.1.2
+	                        //NOTE: Disabling this check to deliberately allow creation of certificates with critical AKID
+				//if e.Critical {
 					// Conforming CAs MUST mark this extension as non-critical
-					return errors.New("x509: subject key identifier incorrectly marked critical")
-				}
+					//return errors.New("x509: subject key identifier incorrectly marked critical")
+				//}
 				val := cryptobyte.String(e.Value)
 				var skid cryptobyte.String
 				if !val.ReadASN1(&skid, cryptobyte_asn1.OCTET_STRING) {
