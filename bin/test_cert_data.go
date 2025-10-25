@@ -11,20 +11,21 @@ import (
 
 type TestCertData struct {
 	CertProfileDescription string
-	LeafPrivateKey string
-	RootCACertPem string
-	IntermedCACertChainPem string
-	LeafCertPem string
 	IsRootCACertValid bool
 	IsIntermedCACertChainValid bool
 	IsLeafCertValid bool
+	NumCACerts uint8
+	RootCACertPem string
+	IntermedCACertChainPem string
+	LeafCertPem string
+	LeafPrivateKey string
 } 
 
 func CreateTestCertData(badCertChain BadCertificateChain) (*TestCertData) {
 	var testCertData TestCertData
         var buf bytes.Buffer
 
-	certChainLength := len(badCertChain.Chain)
+	certChainLength := uint8(len(badCertChain.Chain))
 	
 	if certChainLength < 1 {
 		panic(errors.New("Only a single cert present in chain"))
@@ -63,7 +64,8 @@ func CreateTestCertData(badCertChain BadCertificateChain) (*TestCertData) {
         rootCACert.WriteCertificatePem(&buf)
 	testCertData.RootCACertPem = buf.String()
 	buf.Reset()
-         
+        
+	testCertData.NumCACerts                 = certChainLength - 1
 	testCertData.IsRootCACertValid          = badCertChain.IsRootCACertValid
 	testCertData.IsIntermedCACertChainValid = badCertChain.IsIntermedCACertChainValid
 	testCertData.IsLeafCertValid            = badCertChain.IsLeafCertValid 

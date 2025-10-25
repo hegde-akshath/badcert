@@ -13,10 +13,11 @@ var defaultCertificateParams *DefaultCertificateParams
 
 
 func main() {
-	commandType         := flag.String("command", "custom-certs", "Command To Run(custom-certs | rfc-5280-certs | sign-request)")
-	certOutputDirectory := flag.String("cert_dir", "certs/", "Certificate Output Directory Path")
-	signRequestType     := flag.Int("sign_request_type", 0, "Type of leaf certificate to create during signing")
-	requestFilePath     := flag.String("request_file_path", "req.pem", "Path to Certificate Signing Request File")
+	commandType         := flag.String("command", "custom-certs", "Command To run(custom-certs | rfc-5280-certs | sign-request)")
+	certOutputDirectory := flag.String("cert_dir", "certs/", "Certificate output directory path")
+	certRequestType     := flag.Int("cert_request_type", int(LEAF_CERT_VERSION_1), "Type of leaf certificate to create during signing")
+	certRequestPath     := flag.String("cert_request_path", "req.pem", "Path to certificate signing request file")
+	certRequestSigner   := flag.Int("cert_request_signer", int(CERT_REQUEST_SIGNER_ROOT), "Key to use for signing certificate request file")
 	flag.Parse()
         
         absPath, _ := filepath.Abs(*certOutputDirectory)
@@ -32,7 +33,7 @@ func main() {
 	        GenerateCustomCerts(customCertOutputDirectory)
 	} else if (*commandType == "sign-request") {
 		signRequestCertOutputDirectory := fmt.Sprintf("%s/sign-request/", absPath)
-		SignRequest(signRequestCertOutputDirectory, SignRequestType(*signRequestType), *requestFilePath)
+		SignRequest(signRequestCertOutputDirectory, CertRequestType(*certRequestType), *certRequestPath, CertRequestSigner(*certRequestSigner))
 	} else {
 		panic(errors.New("Invalid command type"))
 	}
