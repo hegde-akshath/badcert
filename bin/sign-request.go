@@ -34,25 +34,6 @@ const (
 	CERT_REQUEST_SIGNER_INTERMED1
 )
 
-var defaultRootCAName = &pkix.Name{
-                Country:            []string{"IN"},
-                Province:           []string{"KA"},
-                Locality:           []string{"BGL"},
-                Organization:       []string{"CSCO"},
-                OrganizationalUnit: []string{"MIG"},
-                CommonName:         "EXAMPLE-CA.cisco.com",
-}
-
-var defaultIntermed1CAName = &pkix.Name{
-                Country:            []string{"IN"},
-                Province:           []string{"KA"},
-                Locality:           []string{"BGL"},
-                Organization:       []string{"CSCO"},
-                OrganizationalUnit: []string{"MIG"},
-                CommonName:         "EXAMPLE-INTERMED1-CA.cisco.com",
-}
-
-
 
 func loadDefaultCAKeys(defaultCADirectoryPath string) (crypto.PrivateKey, crypto.PrivateKey) {
 	rootCAKey      := LoadKey(fmt.Sprintf("%s/root-ca-key.pem", defaultCADirectoryPath))
@@ -492,12 +473,12 @@ func SignRequestBadCertLeafAKIDNotPresent(signRequestCertOutputDirectory string,
 
 
 
-func SignRequest(signRequestCertOutputDirectory string, certRequestType CertRequestType, certRequestPath string, certRequestSigner CertRequestSigner) {
+func SignRequest(defaultCADirectory string, signRequestCertOutputDirectory string, certRequestType CertRequestType, certRequestPath string, certRequestSigner CertRequestSigner) {
 	CreateDirectory(signRequestCertOutputDirectory)
 
 	//NOTE, we also need to pass the correct sigalgo parameter to this
-        rootCAKey, intermed1CAKey   := loadDefaultCAKeys("./CA")
-	rootCACert, intermed1CACert := loadDefaultCACerts("./CA")
+        rootCAKey, intermed1CAKey   := loadDefaultCAKeys(defaultCADirectory)
+	rootCACert, intermed1CACert := loadDefaultCACerts(defaultCADirectory)
 
 	if (certRequestType == LEAF_CERT_VERSION_1) {
 		fmt.Println("Generating Leaf Certificate with Version 1")
