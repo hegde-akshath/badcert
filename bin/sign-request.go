@@ -64,6 +64,8 @@ func SignRequestBadCertLeafVersion1(signRequestCertOutputDirectory string, certR
 
        certRequest = ReadCertificateRequest(certRequestPath)
        
+       certProfileDescription := "Leaf Cert Version is 1"
+       
        subject        = certRequest.Subject
        dnsNames       = certRequest.DNSNames
        emailAddresses = certRequest.EmailAddresses
@@ -76,19 +78,19 @@ func SignRequestBadCertLeafVersion1(signRequestCertOutputDirectory string, certR
        if err != nil {
 		panic(err)
        }
-
+       
        if certRequestSigner == CERT_REQUEST_SIGNER_ROOT {
 	       badLeafRecipe := BuildDefaultLeafRecipe().SetVersion1().SetSubject(&subject).SetIssuer(&rootCACert.Subject).SetSerialNumber(serialNumber)
                modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, dnsNames, emailAddresses, ipAddresses, URIs).UnsetAKIDExtension().SetAKIDExtension(false, rootCACert.SubjectKeyId).UnsetSKIDExtension().SetSKIDExtensionFromKey(false, certRequest.PublicKey)
                badLeafRecipe.SetExtensions(modifiedLeafExtensions)
                badLeafRecipe.SignTBS(rootCAKey, defaultCertificateParams.SignatureAlgorithm)
-               certChain = CreateBadCertificateChain(" ", nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(rootCACert))
+               certChain = CreateBadCertificateChain(certProfileDescription, nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(rootCACert))
        } else if certRequestSigner == CERT_REQUEST_SIGNER_INTERMED1 {
 	       badLeafRecipe := BuildDefaultLeafRecipe().SetVersion1().SetSubject(&subject).SetIssuer(&intermed1CACert.Subject).SetSerialNumber(serialNumber)
                modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, dnsNames, emailAddresses, ipAddresses, URIs).UnsetAKIDExtension().SetAKIDExtension(false, intermed1CACert.SubjectKeyId).UnsetSKIDExtension().SetSKIDExtensionFromKey(false, certRequest.PublicKey)
                badLeafRecipe.SetExtensions(modifiedLeafExtensions) 
                badLeafRecipe.SignTBS(intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-               certChain = CreateBadCertificateChain(" ", nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(intermed1CACert), badcert.CreateBadCertificateFromCertificate(rootCACert))
+               certChain = CreateBadCertificateChain(certProfileDescription, nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(intermed1CACert), badcert.CreateBadCertificateFromCertificate(rootCACert))
        }
 
        testCertData := CreateTestCertData(certChain)      
@@ -108,6 +110,8 @@ func SignRequestBadCertLeafVersion2(signRequestCertOutputDirectory string, certR
 
        certRequest = ReadCertificateRequest(certRequestPath)
        
+       certProfileDescription := "Leaf Cert Version is 2"
+       
        subject        = certRequest.Subject
        dnsNames       = certRequest.DNSNames
        emailAddresses = certRequest.EmailAddresses
@@ -126,13 +130,13 @@ func SignRequestBadCertLeafVersion2(signRequestCertOutputDirectory string, certR
                modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, dnsNames, emailAddresses, ipAddresses, URIs).UnsetAKIDExtension().SetAKIDExtension(false, rootCACert.SubjectKeyId).UnsetSKIDExtension().SetSKIDExtensionFromKey(false, certRequest.PublicKey)
                badLeafRecipe.SetExtensions(modifiedLeafExtensions)
                badLeafRecipe.SignTBS(rootCAKey, defaultCertificateParams.SignatureAlgorithm)
-               certChain = CreateBadCertificateChain(" ", nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(rootCACert))
+               certChain = CreateBadCertificateChain(certProfileDescription, nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(rootCACert))
        } else if certRequestSigner == CERT_REQUEST_SIGNER_INTERMED1 {
                badLeafRecipe := BuildDefaultLeafRecipe().SetVersion2().SetSubject(&subject).SetIssuer(&intermed1CACert.Subject).SetSerialNumber(serialNumber)
                modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, dnsNames, emailAddresses, ipAddresses, URIs).UnsetAKIDExtension().SetAKIDExtension(false, intermed1CACert.SubjectKeyId).UnsetSKIDExtension().SetSKIDExtensionFromKey(false, certRequest.PublicKey)
                badLeafRecipe.SetExtensions(modifiedLeafExtensions) 
                badLeafRecipe.SignTBS(intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-               certChain = CreateBadCertificateChain(" ", nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(intermed1CACert), badcert.CreateBadCertificateFromCertificate(rootCACert))
+               certChain = CreateBadCertificateChain(certProfileDescription, nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(intermed1CACert), badcert.CreateBadCertificateFromCertificate(rootCACert))
        }
 
        testCertData := CreateTestCertData(certChain)
@@ -150,6 +154,8 @@ func SignRequestBadCertLeafPathlenPresent(signRequestCertOutputDirectory string,
        var certChain BadCertificateChain
 
        certRequest = ReadCertificateRequest(certRequestPath)
+       
+       certProfileDescription := "Leaf Cert contains pathlen attribute in Basic Constraints extension"
        
        subject        = certRequest.Subject
        dnsNames       = certRequest.DNSNames
@@ -169,13 +175,13 @@ func SignRequestBadCertLeafPathlenPresent(signRequestCertOutputDirectory string,
                modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, dnsNames, emailAddresses, ipAddresses, URIs).UnsetAKIDExtension().SetAKIDExtension(false, rootCACert.SubjectKeyId).UnsetSKIDExtension().SetSKIDExtensionFromKey(false, certRequest.PublicKey).UnsetBasicConstraintsExtension().SetBasicConstraintsExtension(true, false, 1, false)
                badLeafRecipe.SetExtensions(modifiedLeafExtensions)
                badLeafRecipe.SignTBS(rootCAKey, defaultCertificateParams.SignatureAlgorithm)
-               certChain = CreateBadCertificateChain(" ", nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(rootCACert))
+               certChain = CreateBadCertificateChain(certProfileDescription, nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(rootCACert))
        } else if certRequestSigner == CERT_REQUEST_SIGNER_INTERMED1 {
                badLeafRecipe := BuildDefaultLeafRecipe().SetSubject(&subject).SetIssuer(&intermed1CACert.Subject).SetSerialNumber(serialNumber)
                modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, dnsNames, emailAddresses, ipAddresses, URIs).UnsetAKIDExtension().SetAKIDExtension(false, intermed1CACert.SubjectKeyId).UnsetSKIDExtension().SetSKIDExtensionFromKey(false, certRequest.PublicKey).UnsetBasicConstraintsExtension().SetBasicConstraintsExtension(true, false, 1, false)
                badLeafRecipe.SetExtensions(modifiedLeafExtensions) 
                badLeafRecipe.SignTBS(intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-               certChain = CreateBadCertificateChain(" ", nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(intermed1CACert), badcert.CreateBadCertificateFromCertificate(rootCACert))
+               certChain = CreateBadCertificateChain(certProfileDescription, nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(intermed1CACert), badcert.CreateBadCertificateFromCertificate(rootCACert))
        }
 
        testCertData := CreateTestCertData(certChain)
@@ -195,6 +201,8 @@ func SignRequestBadCertLeafEmptyIssuer(signRequestCertOutputDirectory string, ce
 
        certRequest = ReadCertificateRequest(certRequestPath)
        
+       certProfileDescription := "Leaf Cert contains empty issuer field"
+       
        subject        = certRequest.Subject
        dnsNames       = certRequest.DNSNames
        emailAddresses = certRequest.EmailAddresses
@@ -213,13 +221,13 @@ func SignRequestBadCertLeafEmptyIssuer(signRequestCertOutputDirectory string, ce
                modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, dnsNames, emailAddresses, ipAddresses, URIs).UnsetAKIDExtension().SetAKIDExtension(false, rootCACert.SubjectKeyId).UnsetSKIDExtension().SetSKIDExtensionFromKey(false, certRequest.PublicKey)
                badLeafRecipe.SetExtensions(modifiedLeafExtensions)
                badLeafRecipe.SignTBS(rootCAKey, defaultCertificateParams.SignatureAlgorithm)
-               certChain = CreateBadCertificateChain(" ", nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(rootCACert)) 
+               certChain = CreateBadCertificateChain(certProfileDescription, nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(rootCACert)) 
        } else if certRequestSigner == CERT_REQUEST_SIGNER_INTERMED1 {
 	       badLeafRecipe := BuildDefaultLeafRecipe().SetSubject(&subject).SetIssuer(&pkix.Name{}).SetSerialNumber(serialNumber)
                modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, dnsNames, emailAddresses, ipAddresses, URIs).UnsetAKIDExtension().SetAKIDExtension(false, intermed1CACert.SubjectKeyId).UnsetSKIDExtension().SetSKIDExtensionFromKey(false, certRequest.PublicKey)
                badLeafRecipe.SetExtensions(modifiedLeafExtensions) 
                badLeafRecipe.SignTBS(intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-               certChain = CreateBadCertificateChain(" ", nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(intermed1CACert), badcert.CreateBadCertificateFromCertificate(rootCACert))
+               certChain = CreateBadCertificateChain(certProfileDescription, nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(intermed1CACert), badcert.CreateBadCertificateFromCertificate(rootCACert))
        }
 
        testCertData := CreateTestCertData(certChain)
@@ -233,6 +241,8 @@ func SignRequestBadCertLeafNoSanEmptySubject(signRequestCertOutputDirectory stri
 
        certRequest = ReadCertificateRequest(certRequestPath)
          
+       certProfileDescription := "Leaf cert has no SAN extension but subject field is empty as well"
+       
        //TODO: We need to maintain the issued CRL number and revocation info(and other configuration, so we can use from there)
        //NOTE: Not using goCA or other standard tools as the intention here is the ability to generate bad certificates blocked by crypto/x509
        serialNumber, err := rand.Int(rand.Reader, new(big.Int).Lsh(big.NewInt(1), 128))
@@ -245,13 +255,13 @@ func SignRequestBadCertLeafNoSanEmptySubject(signRequestCertOutputDirectory stri
                modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetSANExtension().UnsetAKIDExtension().SetAKIDExtension(false, rootCACert.SubjectKeyId).UnsetSKIDExtension().SetSKIDExtensionFromKey(false, certRequest.PublicKey)
                badLeafRecipe.SetExtensions(modifiedLeafExtensions)
                badLeafRecipe.SignTBS(rootCAKey, defaultCertificateParams.SignatureAlgorithm)
-               certChain = CreateBadCertificateChain(" ", nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(rootCACert)) 
+               certChain = CreateBadCertificateChain(certProfileDescription, nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(rootCACert)) 
        } else if certRequestSigner == CERT_REQUEST_SIGNER_INTERMED1 {
                badLeafRecipe := BuildDefaultLeafRecipe().SetSubject(&pkix.Name{}).SetIssuer(&intermed1CACert.Subject).SetSerialNumber(serialNumber)
                modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetSANExtension().UnsetAKIDExtension().SetAKIDExtension(false, intermed1CACert.SubjectKeyId).UnsetSKIDExtension().SetSKIDExtensionFromKey(false, certRequest.PublicKey)
                badLeafRecipe.SetExtensions(modifiedLeafExtensions) 
                badLeafRecipe.SignTBS(intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-               certChain = CreateBadCertificateChain(" ", nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(intermed1CACert), badcert.CreateBadCertificateFromCertificate(rootCACert))
+               certChain = CreateBadCertificateChain(certProfileDescription, nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(intermed1CACert), badcert.CreateBadCertificateFromCertificate(rootCACert))
        }
 
        testCertData := CreateTestCertData(certChain)
@@ -265,6 +275,8 @@ func SignRequestBadCertLeafSanPresentButEmpty(signRequestCertOutputDirectory str
        var certChain BadCertificateChain
 
        certRequest = ReadCertificateRequest(certRequestPath)
+       
+       certProfileDescription := "Leaf cert contains SAN extension but it is empty"
        
        subject        = certRequest.Subject
         
@@ -280,13 +292,13 @@ func SignRequestBadCertLeafSanPresentButEmpty(signRequestCertOutputDirectory str
                modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, nil, nil, nil, nil).UnsetAKIDExtension().SetAKIDExtension(false, rootCACert.SubjectKeyId).UnsetSKIDExtension().SetSKIDExtensionFromKey(false, certRequest.PublicKey)
                badLeafRecipe.SetExtensions(modifiedLeafExtensions)
                badLeafRecipe.SignTBS(rootCAKey, defaultCertificateParams.SignatureAlgorithm)
-               certChain = CreateBadCertificateChain(" ", nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(rootCACert)) 
+               certChain = CreateBadCertificateChain(certProfileDescription, nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(rootCACert)) 
        } else if certRequestSigner == CERT_REQUEST_SIGNER_INTERMED1 {
 	       badLeafRecipe        := BuildDefaultLeafRecipe().SetSubject(&subject).SetIssuer(&intermed1CACert.Subject).SetSerialNumber(serialNumber)
                modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, nil, nil, nil, nil).UnsetAKIDExtension().SetAKIDExtension(false, intermed1CACert.SubjectKeyId).UnsetSKIDExtension().SetSKIDExtensionFromKey(false, certRequest.PublicKey)
                badLeafRecipe.SetExtensions(modifiedLeafExtensions) 
                badLeafRecipe.SignTBS(intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-               certChain = CreateBadCertificateChain(" ", nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(intermed1CACert), badcert.CreateBadCertificateFromCertificate(rootCACert)) 
+               certChain = CreateBadCertificateChain(certProfileDescription, nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(intermed1CACert), badcert.CreateBadCertificateFromCertificate(rootCACert)) 
        }
 
        testCertData := CreateTestCertData(certChain)
@@ -307,6 +319,8 @@ func SignRequestBadCertLeafSigalgMismatch(signRequestCertOutputDirectory string,
 
        certRequest = ReadCertificateRequest(certRequestPath)
        
+       certProfileDescription := "Leaf cert sigalg field doesn't match the algorithm field in signature"
+       
        subject        = certRequest.Subject
        dnsNames       = certRequest.DNSNames
        emailAddresses = certRequest.EmailAddresses
@@ -325,13 +339,13 @@ func SignRequestBadCertLeafSigalgMismatch(signRequestCertOutputDirectory string,
                modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, dnsNames, emailAddresses, ipAddresses, URIs).UnsetAKIDExtension().SetAKIDExtension(false, rootCACert.SubjectKeyId).UnsetSKIDExtension().SetSKIDExtensionFromKey(false, certRequest.PublicKey)
                badLeafRecipe.SetExtensions(modifiedLeafExtensions)
                badLeafRecipe.SignTBS(rootCAKey, defaultCertificateParams.SignatureAlgorithm)
-               certChain = CreateBadCertificateChain(" ", nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(rootCACert))
+               certChain = CreateBadCertificateChain(certProfileDescription, nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(rootCACert))
        } else if certRequestSigner == CERT_REQUEST_SIGNER_INTERMED1 {
                badLeafRecipe        := BuildDefaultLeafRecipe().SetSubject(&subject).SetIssuer(&intermed1CACert.Subject).SetSerialNumber(serialNumber).SetSignatureAlgorithm(badcert.SHA384WithRSA)
                modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, dnsNames, emailAddresses, ipAddresses, URIs).UnsetAKIDExtension().SetAKIDExtension(false, intermed1CACert.SubjectKeyId).UnsetSKIDExtension().SetSKIDExtensionFromKey(false, certRequest.PublicKey)
                badLeafRecipe.SetExtensions(modifiedLeafExtensions) 
                badLeafRecipe.SignTBS(intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-               certChain = CreateBadCertificateChain(" ", nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(intermed1CACert), badcert.CreateBadCertificateFromCertificate(rootCACert))
+               certChain = CreateBadCertificateChain(certProfileDescription, nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(intermed1CACert), badcert.CreateBadCertificateFromCertificate(rootCACert))
        
        }
  
@@ -353,6 +367,8 @@ func SignRequestBadCertLeafAKIDCritical(signRequestCertOutputDirectory string, c
 
        certRequest = ReadCertificateRequest(certRequestPath)
        
+       certProfileDescription := "Leaf cert contains AKID extension marked as critical"
+       
        subject        = certRequest.Subject
        dnsNames       = certRequest.DNSNames
        emailAddresses = certRequest.EmailAddresses
@@ -371,13 +387,13 @@ func SignRequestBadCertLeafAKIDCritical(signRequestCertOutputDirectory string, c
                modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, dnsNames, emailAddresses, ipAddresses, URIs).UnsetAKIDExtension().SetAKIDExtension(true, rootCACert.SubjectKeyId).UnsetSKIDExtension().SetSKIDExtensionFromKey(false, certRequest.PublicKey)
                badLeafRecipe.SetExtensions(modifiedLeafExtensions)
                badLeafRecipe.SignTBS(rootCAKey, defaultCertificateParams.SignatureAlgorithm)
-               certChain = CreateBadCertificateChain(" ", nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(rootCACert))
+               certChain = CreateBadCertificateChain(certProfileDescription, nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(rootCACert))
        } else if certRequestSigner == CERT_REQUEST_SIGNER_INTERMED1 {
                badLeafRecipe        := BuildDefaultLeafRecipe().SetSubject(&subject).SetIssuer(&intermed1CACert.Subject).SetSerialNumber(serialNumber)
                modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, dnsNames, emailAddresses, ipAddresses, URIs).UnsetAKIDExtension().SetAKIDExtension(true, intermed1CACert.SubjectKeyId).UnsetSKIDExtension().SetSKIDExtensionFromKey(false, certRequest.PublicKey)
                badLeafRecipe.SetExtensions(modifiedLeafExtensions) 
                badLeafRecipe.SignTBS(intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-               certChain = CreateBadCertificateChain(" ", nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(intermed1CACert), badcert.CreateBadCertificateFromCertificate(rootCACert))
+               certChain = CreateBadCertificateChain(certProfileDescription, nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(intermed1CACert), badcert.CreateBadCertificateFromCertificate(rootCACert))
        }
  
        testCertData := CreateTestCertData(certChain)
@@ -395,6 +411,8 @@ func SignRequestBadCertLeafSKIDCritical(signRequestCertOutputDirectory string, c
        var certChain BadCertificateChain
 
        certRequest = ReadCertificateRequest(certRequestPath)
+       
+       certProfileDescription := "Leaf cert contains SKID extension marked as critical"
        
        subject        = certRequest.Subject
        dnsNames       = certRequest.DNSNames
@@ -414,13 +432,13 @@ func SignRequestBadCertLeafSKIDCritical(signRequestCertOutputDirectory string, c
                modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, dnsNames, emailAddresses, ipAddresses, URIs).UnsetAKIDExtension().SetAKIDExtension(false, rootCACert.SubjectKeyId).UnsetSKIDExtension().SetSKIDExtensionFromKey(true, certRequest.PublicKey)
                badLeafRecipe.SetExtensions(modifiedLeafExtensions)
                badLeafRecipe.SignTBS(rootCAKey, defaultCertificateParams.SignatureAlgorithm)
-               certChain = CreateBadCertificateChain(" ", nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(rootCACert))
+               certChain = CreateBadCertificateChain(certProfileDescription, nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(rootCACert))
        } else if certRequestSigner == CERT_REQUEST_SIGNER_INTERMED1 {
                badLeafRecipe        := BuildDefaultLeafRecipe().SetSubject(&subject).SetIssuer(&intermed1CACert.Subject).SetSerialNumber(serialNumber)
                modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, dnsNames, emailAddresses, ipAddresses, URIs).UnsetAKIDExtension().SetAKIDExtension(false, intermed1CACert.SubjectKeyId).UnsetSKIDExtension().SetSKIDExtensionFromKey(true, certRequest.PublicKey)
                badLeafRecipe.SetExtensions(modifiedLeafExtensions) 
                badLeafRecipe.SignTBS(intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-               certChain = CreateBadCertificateChain(" ", nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(intermed1CACert), badcert.CreateBadCertificateFromCertificate(rootCACert))
+               certChain = CreateBadCertificateChain(certProfileDescription, nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(intermed1CACert), badcert.CreateBadCertificateFromCertificate(rootCACert))
        }
 
        testCertData := CreateTestCertData(certChain)
@@ -438,6 +456,8 @@ func SignRequestBadCertLeafAKIDNotPresent(signRequestCertOutputDirectory string,
        var certChain BadCertificateChain
 
        certRequest = ReadCertificateRequest(certRequestPath)
+       
+       certProfileDescription := "Leaf cert doesn't contain AKID extension"
        
        subject        = certRequest.Subject
        dnsNames       = certRequest.DNSNames
@@ -457,13 +477,13 @@ func SignRequestBadCertLeafAKIDNotPresent(signRequestCertOutputDirectory string,
                modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, dnsNames, emailAddresses, ipAddresses, URIs).UnsetAKIDExtension().UnsetSKIDExtension().SetSKIDExtensionFromKey(false, certRequest.PublicKey)
                badLeafRecipe.SetExtensions(modifiedLeafExtensions)
                badLeafRecipe.SignTBS(rootCAKey, defaultCertificateParams.SignatureAlgorithm)
-               certChain = CreateBadCertificateChain(" ", nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(rootCACert))
+               certChain = CreateBadCertificateChain(certProfileDescription, nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(rootCACert))
        } else if certRequestSigner == CERT_REQUEST_SIGNER_INTERMED1 {
 	       badLeafRecipe        := BuildDefaultLeafRecipe().SetSubject(&subject).SetIssuer(&intermed1CACert.Subject).SetSerialNumber(serialNumber)
                modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, dnsNames, emailAddresses, ipAddresses, URIs).UnsetAKIDExtension().UnsetSKIDExtension().SetSKIDExtensionFromKey(false, certRequest.PublicKey)
                badLeafRecipe.SetExtensions(modifiedLeafExtensions) 
                badLeafRecipe.SignTBS(intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-               certChain = CreateBadCertificateChain(" ", nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(intermed1CACert), badcert.CreateBadCertificateFromCertificate(rootCACert))
+               certChain = CreateBadCertificateChain(certProfileDescription, nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(intermed1CACert), badcert.CreateBadCertificateFromCertificate(rootCACert))
        }
 
        testCertData := CreateTestCertData(certChain)

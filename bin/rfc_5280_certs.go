@@ -16,18 +16,20 @@ func X509_VERSION_1(outputDirectory string) {
         var index int
 	var badCertificateChain BadCertificateChain
 
+	certProfileDescription := "Extensions are present but version is 1"
 	badRootCARecipe      = BuildDefaultRootCARecipe().SetVersion1()
         badIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetVersion1()
         badLeafRecipe        = BuildDefaultLeafRecipe().SetVersion1()
-	badCertificateChains := BuildBadCertificateChains(badRootCARecipe, badIntermed1CARecipe, badLeafRecipe, " ")
+	badCertificateChains := BuildBadCertificateChains(badRootCARecipe, badIntermed1CARecipe, badLeafRecipe, certProfileDescription)
 	for index, badCertificateChain = range *badCertificateChains {
 		WriteBadCertChain(badCertificateChain, fmt.Sprintf("%s/X509-VERSION-1-CAT1-%d.pem", outputDirectory, index))
 	}
-
+ 
+	certProfileDescription = "Extensions are present but version is 2"
 	badRootCARecipe      = BuildDefaultRootCARecipe().SetVersion2()
         badIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetVersion2()
         badLeafRecipe        = BuildDefaultLeafRecipe().SetVersion2()
-	badCertificateChains = BuildBadCertificateChains(badRootCARecipe, badIntermed1CARecipe, badLeafRecipe, " ")
+	badCertificateChains = BuildBadCertificateChains(badRootCARecipe, badIntermed1CARecipe, badLeafRecipe, certProfileDescription)
 	for index, badCertificateChain = range *badCertificateChains {
 		WriteBadCertChain(badCertificateChain, fmt.Sprintf("%s/X509-VERSION-1-CAT2-%d.pem", outputDirectory, index))
 	}
@@ -46,9 +48,10 @@ func X509_SUBJECT_1(outputDirectory string) {
 
 	emptySubject = &pkix.Name{}
 	
+	certProfileDescription := "Basic Constraints Extension is present, CA is set to true and key usage contains keyCertSign. But the subject field is empty"
 	badRootCARecipe      = BuildDefaultRootCARecipe().SetSubject(emptySubject)
         badIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetSubject(emptySubject)
-	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, " ")
+	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
 	for index, badCertificateChain = range *badCertificateChains {
 		WriteBadCertChain(badCertificateChain, fmt.Sprintf("%s/X509-SUBJECT-1-CAT1-%d.pem", outputDirectory, index))
 	}
@@ -63,14 +66,15 @@ func X509_SUBJECT_2(outputDirectory string) {
 	var emptySubject *pkix.Name
         	
 	emptySubject = &pkix.Name{}
-	        
+	
+	certProfileDescription := "Leaf certificate contains subject name information in SAN, the Subject field is empty, but SAN is not marked as critical"
 	goodRootCARecipe      = BuildDefaultRootCARecipe()
         goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
         badLeafRecipe        = BuildDefaultLeafRecipe().SetSubject(emptySubject)
 	goodRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
         goodIntermed1CARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
 	badLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-        certChain = CreateBadCertificateChain(" ", defaultCertificateParams.LeafKey, true, true, false, badLeafRecipe, goodIntermed1CARecipe, goodRootCARecipe)
+        certChain = CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, true, true, false, badLeafRecipe, goodIntermed1CARecipe, goodRootCARecipe)
 	WriteBadCertChain(certChain, fmt.Sprintf("%s/X509-SUBJECT-2-CAT1-1.pem", outputDirectory))
 }
 
@@ -83,14 +87,15 @@ func X509_EXT_BASIC_CONST_1(outputDirectory string) {
 	var badIntermed1CARecipe *badcert.BadCertificate
 	var modifiedRootCAExtensions badcert.ExtensionSlice
 	var modifiedIntermed1CAExtensions badcert.ExtensionSlice
-		
+	
+	certProfileDescription := "Basic Constraints Extension is present, and CA is set to false, but key usage contains keyCertSign"
 	badRootCARecipe      = BuildDefaultRootCARecipe()
         modifiedRootCAExtensions = badRootCARecipe.GetExtensions().UnsetBasicConstraintsExtension().SetBasicConstraintsExtension(true, false, 1, false)
 	badRootCARecipe.SetExtensions(modifiedRootCAExtensions)
         badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetBasicConstraintsExtension().SetBasicConstraintsExtension(true, false, 0, false)
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
-	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, " ")
+	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
 	for index, badCertificateChain := range *badCertificateChains {
 		WriteBadCertChain(badCertificateChain, fmt.Sprintf("%s/X509-EXT-BASIC-CONST-1-CAT1-%d.pem", outputDirectory, index))
 	}
@@ -105,25 +110,27 @@ func X509_EXT_BASIC_CONST_2(outputDirectory string) {
 	var modifiedIntermed1CAExtensions badcert.ExtensionSlice
 	var index int
 	var badCertificateChain BadCertificateChain
-
+        
+	certProfileDescription := "Basic Constraints Extension is absent, but key usage contains keyCertSign"
 	badRootCARecipe      = BuildDefaultRootCARecipe()
         modifiedRootCAExtensions = badRootCARecipe.GetExtensions().UnsetBasicConstraintsExtension()
 	badRootCARecipe.SetExtensions(modifiedRootCAExtensions)
         badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetBasicConstraintsExtension()
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions) 
-	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, " ")
+	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
 	for index, badCertificateChain = range *badCertificateChains {
 		WriteBadCertChain(badCertificateChain, fmt.Sprintf("%s/X509-EXT-BASIC-CONST-2-CAT1-%d.pem", outputDirectory, index))
 	}
 
+	certProfileDescription = "Basic Constraints Extension is present, and CA is set to false, but key usage contains keyCertSign"
 	badRootCARecipe      = BuildDefaultRootCARecipe()
         modifiedRootCAExtensions = badRootCARecipe.GetExtensions().UnsetBasicConstraintsExtension().SetBasicConstraintsExtension(true, false, 1, false)
 	badRootCARecipe.SetExtensions(modifiedRootCAExtensions)
         badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetBasicConstraintsExtension().SetBasicConstraintsExtension(true, false, 0, false)
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
-	badCertificateChains = BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, " ")
+	badCertificateChains = BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
 	for index, badCertificateChain = range *badCertificateChains {
 		WriteBadCertChain(badCertificateChain, fmt.Sprintf("%s/X509-EXT-BASIC-CONST-2-CAT2-%d.pem", outputDirectory, index))
 	}
@@ -141,24 +148,26 @@ func X509_EXT_BASIC_CONST_3(outputDirectory string) {
 	var index int
 	var badCertificateChain BadCertificateChain
 
+	certProfileDescription := "Basic Constraints Extension is absent, but key usage contains keyCertSign and/or the key is used to validate signatures on certificates"
 	badRootCARecipe      = BuildDefaultRootCARecipe()
         modifiedRootCAExtensions = badRootCARecipe.GetExtensions().UnsetBasicConstraintsExtension()
 	badRootCARecipe.SetExtensions(modifiedRootCAExtensions)
         badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetBasicConstraintsExtension()
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
-	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, " ")
+	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
 	for index, badCertificateChain = range *badCertificateChains {
 		WriteBadCertChain(badCertificateChain, fmt.Sprintf("%s/X509-EXT-BASIC-CONST-3-CAT1-%d.pem", outputDirectory, index))
 	}
 
+	certProfileDescription = "Basic constraints extension is present, but hasn't been marked as critical. key usage contains keyCertSign and/or the key is used to validate signatures on certificates"
 	badRootCARecipe      = BuildDefaultRootCARecipe()
         modifiedRootCAExtensions = badRootCARecipe.GetExtensions().UnsetBasicConstraintsExtension().SetBasicConstraintsExtension(false, true, 1, false)
 	badRootCARecipe.SetExtensions(modifiedRootCAExtensions)
         badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetBasicConstraintsExtension().SetBasicConstraintsExtension(false, true, 0, false)
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
-	badCertificateChains = BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, " ")
+	badCertificateChains = BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
 	for index, badCertificateChain = range *badCertificateChains {
 		WriteBadCertChain(badCertificateChain, fmt.Sprintf("%s/X509-EXT-BASIC-CONST-3-CAT2-%d.pem", outputDirectory, index))
 	}
@@ -175,6 +184,7 @@ func X509_EXT_BASIC_CONST_5(outputDirectory string) {
 	var modifiedLeafExtensions badcert.ExtensionSlice
         var certChain BadCertificateChain 
 			
+	certProfileDescription := "Leaf certificate contains basic constraints extension set to false, and KeyCertSign extension is absent in keyusage. Basic constraint extension is marked as critical"
 	goodRootCARecipe      = BuildDefaultRootCARecipe()
         goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
         goodLeafRecipe        = BuildDefaultLeafRecipe()
@@ -183,9 +193,10 @@ func X509_EXT_BASIC_CONST_5(outputDirectory string) {
 	goodRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
         goodIntermed1CARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
 	goodLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-        certChain = CreateBadCertificateChain(" ", defaultCertificateParams.LeafKey, true, true, true, goodLeafRecipe, goodIntermed1CARecipe, goodRootCARecipe)
+        certChain = CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, true, true, true, goodLeafRecipe, goodIntermed1CARecipe, goodRootCARecipe)
 	WriteBadCertChain(certChain, fmt.Sprintf("%s/X509-EXT-BASIC-CONST-5-CAT1-1.pem", outputDirectory))
 
+	certProfileDescription = "Leaf certificate contains basic constraints extension set to false, and KeyCertSign extension is absent in keyusage. Basic constraint extension is not marked as critical"
 	goodRootCARecipe      = BuildDefaultRootCARecipe()
         goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
         goodLeafRecipe        = BuildDefaultLeafRecipe()
@@ -194,7 +205,7 @@ func X509_EXT_BASIC_CONST_5(outputDirectory string) {
 	goodRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
         goodIntermed1CARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
 	goodLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-        certChain = CreateBadCertificateChain(" ", defaultCertificateParams.LeafKey, true, true, true, goodLeafRecipe, goodIntermed1CARecipe, goodRootCARecipe)
+        certChain = CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, true, true, true, goodLeafRecipe, goodIntermed1CARecipe, goodRootCARecipe)
 	WriteBadCertChain(certChain, fmt.Sprintf("%s/X509-EXT-BASIC-CONST-5-CAT2-1.pem", outputDirectory))
 }
 
@@ -209,24 +220,26 @@ func X509_EXT_BASIC_CONST_6(outputDirectory string) {
 	var index int
 	var badCertificateChain BadCertificateChain
 
+	certProfileDescription := "Basic Constraints Extension is present, keyCertSign bit is set and CA is set to false. But the pathlen attribute is still included"
 	badRootCARecipe      = BuildDefaultRootCARecipe()
         modifiedRootCAExtensions = badRootCARecipe.GetExtensions().UnsetBasicConstraintsExtension().SetBasicConstraintsExtension(true, false, 1, false)
 	badRootCARecipe.SetExtensions(modifiedRootCAExtensions)
         badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetBasicConstraintsExtension().SetBasicConstraintsExtension(true, false, 0, false)
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
-	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, " ")
+	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
 	for index, badCertificateChain = range *badCertificateChains {
 		WriteBadCertChain(badCertificateChain, fmt.Sprintf("%s/X509-EXT-BASIC-CONST-6-CAT1-%d.pem", outputDirectory, index))
 	}
 
+	certProfileDescription = "Basic Constraints Extension is present, keyCertSign bit is not set and CA is set to true. But the pathlen attribute is still included"
 	badRootCARecipe      = BuildDefaultRootCARecipe()
         modifiedRootCAExtensions = badRootCARecipe.GetExtensions().UnsetKeyUsageExtension().SetKeyUsageExtension(false, badcert.KeyUsageEncipherOnly)
 	badRootCARecipe.SetExtensions(modifiedRootCAExtensions)
         badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetKeyUsageExtension().SetKeyUsageExtension(false, badcert.KeyUsageEncipherOnly)
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
-	badCertificateChains = BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, " ")
+	badCertificateChains = BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
 	for index, badCertificateChain = range *badCertificateChains {
 		WriteBadCertChain(badCertificateChain, fmt.Sprintf("%s/X509-EXT-BASIC-CONST-6-CAT2-%d.pem", outputDirectory, index))
 	}
@@ -241,13 +254,14 @@ func X509_EXT_BASIC_CONST_7(outputDirectory string) {
 	var index int
 	var badCertificateChain BadCertificateChain
 
+	certProfileDescription := "Basic Constraints Extension is present, keyCertSign bit is set and CA is set to true. But the pathlen attribute contains a negative integer"
 	badRootCARecipe      = BuildDefaultRootCARecipe()
         modifiedRootCAExtensions = badRootCARecipe.GetExtensions().UnsetBasicConstraintsExtension().SetBasicConstraintsExtension(true, true, -2, false)
 	badRootCARecipe.SetExtensions(modifiedRootCAExtensions)
         badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetBasicConstraintsExtension().SetBasicConstraintsExtension(true, true, -2, false)
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
-	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, "")
+	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
 	for index, badCertificateChain = range *badCertificateChains {
 		WriteBadCertChain(badCertificateChain, fmt.Sprintf("%s/X509-EXT-BASIC-CONST-7-CAT1-%d.pem", outputDirectory, index))
 	}
@@ -263,7 +277,8 @@ func X509_EXT_SAN_1(outputDirectory string) {
 	var goodLeafRecipe *badcert.BadCertificate
 	var modifiedLeafExtensions badcert.ExtensionSlice
         var certChain BadCertificateChain
-		
+	
+	certProfileDescription := "SAN extension is present in the leaf certificate and names of more than one form are present"
 	goodRootCARecipe      = BuildDefaultRootCARecipe()
         goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
         goodLeafRecipe        = BuildDefaultLeafRecipe()
@@ -272,9 +287,10 @@ func X509_EXT_SAN_1(outputDirectory string) {
 	goodRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
         goodIntermed1CARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
 	goodLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-        certChain = CreateBadCertificateChain("", defaultCertificateParams.LeafKey, true, true, true, goodLeafRecipe, goodIntermed1CARecipe, goodRootCARecipe)
+        certChain = CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, true, true, true, goodLeafRecipe, goodIntermed1CARecipe, goodRootCARecipe)
 	WriteBadCertChain(certChain, fmt.Sprintf("%s/X509-EXT-SAN-1-CAT1-1.pem", outputDirectory))
 	
+	certProfileDescription = "SAN extension is present in the leaf certificate and multiple instances of names of more than one form are present"
         goodRootCARecipe      = BuildDefaultRootCARecipe()
         goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
         goodLeafRecipe        = BuildDefaultLeafRecipe()
@@ -283,7 +299,7 @@ func X509_EXT_SAN_1(outputDirectory string) {
 	goodRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
         goodIntermed1CARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
 	goodLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-        certChain = CreateBadCertificateChain("", defaultCertificateParams.LeafKey, true, true, true, goodLeafRecipe, goodIntermed1CARecipe, goodRootCARecipe)
+        certChain = CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, true, true, true, goodLeafRecipe, goodIntermed1CARecipe, goodRootCARecipe)
 	WriteBadCertChain(certChain, fmt.Sprintf("%s/X509-EXT-SAN-1-CAT1-2.pem", outputDirectory))
 }
 
