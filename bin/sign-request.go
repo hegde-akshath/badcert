@@ -306,7 +306,6 @@ func SignRequestBadCertLeafSanPresentButEmpty(signRequestCertOutputDirectory str
 
 }
 
-/*
 func SignRequestBadCertLeafSigalgMismatch(signRequestCertOutputDirectory string, certRequestPath string, certRequestSigner CertRequestSigner, rootCAKey crypto.PrivateKey, intermed1CAKey crypto.PrivateKey, rootCACert *badcert.Certificate, intermed1CACert *badcert.Certificate) {	
        var certRequest *badcert.CertificateRequest
        var subject pkix.Name
@@ -335,13 +334,13 @@ func SignRequestBadCertLeafSigalgMismatch(signRequestCertOutputDirectory string,
        }
 
        if certRequestSigner == CERT_REQUEST_SIGNER_ROOT {
-	       badLeafRecipe        := BuildDefaultLeafRecipe().SetSubject(&subject).SetIssuer(&rootCACert.Subject).SetSerialNumber(serialNumber).SetSignatureAlgorithm(badcert.SHA384WithRSA)
+	       badLeafRecipe        := BuildDefaultLeafRecipe().SetSubject(&subject).SetIssuer(&rootCACert.Subject).SetSerialNumber(serialNumber).SetSignatureAlgorithmFromPrivateKey(rootCAKey, badcert.SHA384WithRSA)
                modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, dnsNames, emailAddresses, ipAddresses, URIs).UnsetAKIDExtension().SetAKIDExtension(false, rootCACert.SubjectKeyId).UnsetSKIDExtension().SetSKIDExtensionFromKey(false, certRequest.PublicKey)
                badLeafRecipe.SetExtensions(modifiedLeafExtensions)
                badLeafRecipe.SignTBS(rootCAKey, defaultCertificateParams.SignatureAlgorithm)
                certChain = CreateBadCertificateChain(certProfileDescription, nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(rootCACert))
        } else if certRequestSigner == CERT_REQUEST_SIGNER_INTERMED1 {
-               badLeafRecipe        := BuildDefaultLeafRecipe().SetSubject(&subject).SetIssuer(&intermed1CACert.Subject).SetSerialNumber(serialNumber).SetSignatureAlgorithm(badcert.SHA384WithRSA)
+               badLeafRecipe        := BuildDefaultLeafRecipe().SetSubject(&subject).SetIssuer(&intermed1CACert.Subject).SetSerialNumber(serialNumber).SetSignatureAlgorithmFromPrivateKey(intermed1CAKey, badcert.SHA384WithRSA)
                modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, dnsNames, emailAddresses, ipAddresses, URIs).UnsetAKIDExtension().SetAKIDExtension(false, intermed1CACert.SubjectKeyId).UnsetSKIDExtension().SetSKIDExtensionFromKey(false, certRequest.PublicKey)
                badLeafRecipe.SetExtensions(modifiedLeafExtensions) 
                badLeafRecipe.SignTBS(intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
@@ -352,7 +351,6 @@ func SignRequestBadCertLeafSigalgMismatch(signRequestCertOutputDirectory string,
        testCertData := CreateTestCertData(certChain)
        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/LEAF-CERT-SIGALG-MISMATCH.json", signRequestCertOutputDirectory))
 }
-*/
 
 
 func SignRequestBadCertLeafAKIDCritical(signRequestCertOutputDirectory string, certRequestPath string, certRequestSigner CertRequestSigner, rootCAKey crypto.PrivateKey, intermed1CAKey crypto.PrivateKey, rootCACert *badcert.Certificate, intermed1CACert *badcert.Certificate) {
@@ -518,6 +516,9 @@ func SignRequest(defaultCADirectory string, signRequestCertOutputDirectory strin
 	} else if (certRequestType == LEAF_CERT_SAN_PRESENT_BUT_EMPTY) {
 		fmt.Println("Generating Leaf Certificate with SAN extension but contents empty")
 		SignRequestBadCertLeafSanPresentButEmpty(signRequestCertOutputDirectory, certRequestPath, certRequestSigner, rootCAKey, intermed1CAKey, rootCACert, intermed1CACert)
+	} else if (certRequestType == LEAF_CERT_SIG_ALG_MISMATCH) {
+		fmt.Println("Generating Leaf Certificate with mismatch in sigalg fields")
+		SignRequestBadCertLeafSigalgMismatch(signRequestCertOutputDirectory, certRequestPath, certRequestSigner, rootCAKey, intermed1CAKey, rootCACert, intermed1CACert)
 	} else if (certRequestType == LEAF_CERT_AKID_CRITICAL) {
 		fmt.Println("Generating Leaf Certificate with AKID extension marked critical")
 		SignRequestBadCertLeafAKIDCritical(signRequestCertOutputDirectory, certRequestPath, certRequestSigner, rootCAKey, intermed1CAKey, rootCACert, intermed1CACert)

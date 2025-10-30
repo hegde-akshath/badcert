@@ -270,6 +270,16 @@ func (tbsCert *tbsCertificate) SetSignatureAlgorithm(algorithmIdentifier pkix.Al
 	return tbsCert
 }
 
+func (tbsCert *tbsCertificate) SetSignatureAlgorithmFromPrivateKey(privKey crypto.PrivateKey, signatureAlgorithm SignatureAlgorithm) (*tbsCertificate) {
+	signer, _ := GetSignerFromKey(privKey)
+	
+	_, algorithmIdentifier, err := signingParamsForKey(signer, signatureAlgorithm)
+	if err != nil {
+		panic(err)
+	}
+	return(tbsCert.SetSignatureAlgorithm(algorithmIdentifier))
+}
+
 func (tbsCert *tbsCertificate) SetIssuer(issuer *pkix.Name)(*tbsCertificate) {
         asn1Issuer, err := asn1.Marshal(issuer.ToRDNSequence())
 	if err != nil {
@@ -288,35 +298,30 @@ func (tbsCert *tbsCertificate) SetSubject(subject *pkix.Name)(*tbsCertificate) {
 	return tbsCert
 }
 
-
 func (tbsCert *tbsCertificate) SetValidity(notBefore *time.Time, notAfter *time.Time)(*tbsCertificate) {
 	validity := validity{notBefore.UTC(), notAfter.UTC()}
         tbsCert.Validity = validity
 	return tbsCert
 }
 
-func (tbsCert *tbsCertificate) SetCertificatePublicKey(privKey crypto.PrivateKey, signatureAlgorithm SignatureAlgorithm) (*tbsCertificate) {
-	var signer crypto.Signer
-        var pubKey crypto.PublicKey
-
-	signer, pubKey = GetSignerFromKey(privKey)
-	
-	signatureAlgorithm, algorithmIdentifier, err := signingParamsForKey(signer, signatureAlgorithm)
+func (tbsCert *tbsCertificate) SetCertificatePublicKey(pubKey crypto.PublicKey) (*tbsCertificate) {
+        pubKeyBytes, pubKeyAlgorithm, err := marshalPublicKey(pubKey)
 	if err != nil {
 		panic(err)
 	}
 
-	tbsCert = tbsCert.SetSignatureAlgorithm(algorithmIdentifier)
-
-	pubKeyBytes, pubKeyAlgorithm, err := marshalPublicKey(pubKey)
-	if err != nil {
-		panic(err)
-	}
-		
-	encodedPublicKey := asn1.BitString{BitLength: len(pubKeyBytes) * 8, Bytes: pubKeyBytes} 
-	tbsCert.PublicKey          = publicKeyInfo{nil, pubKeyAlgorithm, encodedPublicKey} 
+        encodedPublicKey := asn1.BitString{BitLength: len(pubKeyBytes) * 8, Bytes: pubKeyBytes} 
+	tbsCert.PublicKey = publicKeyInfo{nil, pubKeyAlgorithm, encodedPublicKey} 
 	return tbsCert
 }
+
+func (tbsCert *tbsCertificate) SetCertificatePublicKeyFromPrivateKey(privKey crypto.PrivateKey) (*tbsCertificate) {
+        var pubKey crypto.PublicKey
+
+	_, pubKey = GetSignerFromKey(privKey)
+        return (tbsCert.SetCertificatePublicKey(pubKey))
+}
+
 
 func (tbsCert *tbsCertificate) SetSubjectUniqueId(subjectUniqueId []byte) (*tbsCertificate) {
 	tbsCert.SubjectUniqueId = asn1.BitString{Bytes: subjectUniqueId, BitLength: len(subjectUniqueId)}
@@ -587,6 +592,16 @@ func (badcert *BadCertificate) SetValidity(notBefore *time.Time, notAfter *time.
 	return badcert
 }
 
+func (badcert *BadCertificate) SetSignatureAlgorithm(algorithmIdentifier pkix.AlgorithmIdentifier)(*BadCertificate) {
+	badcert.tbscert = badcert.tbscert.SetSignatureAlgorithm(algorithmIdentifier)
+	return badcert
+}
+
+func (badcert *BadCertificate) SetSignatureAlgorithmFromPrivateKey(privKey crypto.PrivateKey, signatureAlgorithm SignatureAlgorithm) (*BadCertificate) {
+	badcert.tbscert = badcert.tbscert.SetSignatureAlgorithmFromPrivateKey(privKey, signatureAlgorithm)
+	return badcert
+}
+
 func (badcert *BadCertificate) SetSubjectUniqueId(subjectUniqueId []byte)(*BadCertificate) {
 	badcert.tbscert = badcert.tbscert.SetSubjectUniqueId(subjectUniqueId)
 	return badcert
@@ -626,13 +641,15 @@ func (badcert *BadCertificate) GetExtensions() (extensions ExtensionSlice) {
         return(badcert.tbscert.GetExtensions())
 }
 
-func (badcert *BadCertificate) SetCertificatePublicKey(privKey crypto.PrivateKey, signatureAlgorithm SignatureAlgorithm) (*BadCertificate) {
-	badcert.tbscert = badcert.tbscert.SetCertificatePublicKey(privKey, signatureAlgorithm)
+func (badcert *BadCertificate) SetCertificatePublicKey(pubKey crypto.PublicKey) (*BadCertificate) {
+	badcert.tbscert = badcert.tbscert.SetCertificatePublicKey(pubKey)
 	return badcert
 }
 
-
-
+func (badcert *BadCertificate) SetCertificatePublicKeyFromPrivateKey(privKey crypto.PrivateKey) (*BadCertificate) {
+	badcert.tbscert = badcert.tbscert.SetCertificatePublicKeyFromPrivateKey(privKey)
+	return badcert
+}
 
 func (badcert *BadCertificate) SignTBS(privKey crypto.PrivateKey, signatureAlgorithm SignatureAlgorithm) (*BadCertificate) { 
 	signer, _ := GetSignerFromKey(privKey)

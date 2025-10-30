@@ -983,9 +983,12 @@ func parseCertificate(der []byte) (*Certificate, error) {
 	if !input.ReadASN1(&outerSigAISeq, cryptobyte_asn1.SEQUENCE) {
 		return nil, errors.New("x509: malformed algorithm identifier")
 	}
-	if !bytes.Equal(outerSigAISeq, sigAISeq) {
-		return nil, errors.New("x509: inner and outer signature algorithm identifiers don't match")
-	}
+
+	/*NOTE: Disabling this check intentionally to allow for creation of certificate with malformed fields*/
+	//if !bytes.Equal(outerSigAISeq, sigAISeq) {
+	//	return nil, errors.New("x509: inner and outer signature algorithm identifiers don't match")
+	//}
+
 	sigAI, err := parseAI(sigAISeq)
 	if err != nil {
 		return nil, err
