@@ -106,16 +106,16 @@ func GenerateDefaultCertificateParams() (*DefaultCertificateParams) {
 
 
 func BuildDefaultRootCAExtensions() (badcert.ExtensionSlice) {
-        return(badcert.CreateExtensions().SetBasicConstraintsExtension(true, true, 1, false).SetKeyUsageExtension(true, badcert.KeyUsageDigitalSignature|badcert.KeyUsageCertSign|badcert.KeyUsageCRLSign).SetAKIDExtensionFromKey(false, defaultCertificateParams.RootCAPubkey).SetSKIDExtensionFromKey(false, defaultCertificateParams.RootCAPubkey).SetSANExtension(false, []string{"BADCERT-ROOT-CA.cisco.com"}, nil, nil, nil))
+        return(badcert.CreateExtensions().SetBasicConstraintsExtension(true, true, 1, false).SetKeyUsageExtension(false, badcert.KeyUsageDigitalSignature|badcert.KeyUsageCertSign|badcert.KeyUsageCRLSign).SetAKIDExtensionFromKey(false, defaultCertificateParams.RootCAPubkey).SetSKIDExtensionFromKey(false, defaultCertificateParams.RootCAPubkey).SetSANExtension(false, []string{"BADCERT-ROOT-CA.cisco.com"}, nil, nil, nil))
 }
 
 func BuildDefaultIntermed1CAExtensions() (badcert.ExtensionSlice) {
-        return(badcert.CreateExtensions().SetBasicConstraintsExtension(true, true, 0, true).SetKeyUsageExtension(true, badcert.KeyUsageDigitalSignature|badcert.KeyUsageCertSign|badcert.KeyUsageCRLSign).SetAKIDExtensionFromKey(false, defaultCertificateParams.RootCAPubkey).SetSKIDExtensionFromKey(false, defaultCertificateParams.Intermed1CAPubkey).SetSANExtension(false, []string{"BADCERT-INTERMED1-CA.cisco.com"}, nil, nil, nil))
+        return(badcert.CreateExtensions().SetBasicConstraintsExtension(true, true, 0, true).SetKeyUsageExtension(false, badcert.KeyUsageDigitalSignature|badcert.KeyUsageCertSign|badcert.KeyUsageCRLSign).SetAKIDExtensionFromKey(false, defaultCertificateParams.RootCAPubkey).SetSKIDExtensionFromKey(false, defaultCertificateParams.Intermed1CAPubkey).SetSANExtension(false, []string{"BADCERT-INTERMED1-CA.cisco.com"}, nil, nil, nil))
 }
 
 func BuildDefaultLeafExtensions() (badcert.ExtensionSlice) {
         extKeyUsageSlice := []badcert.ExtKeyUsage{badcert.ExtKeyUsageServerAuth}
-        return(badcert.CreateExtensions().SetBasicConstraintsExtension(true, false, 0, false).SetKeyUsageExtension(true, badcert.KeyUsageDigitalSignature|badcert.KeyUsageKeyEncipherment).SetExtKeyUsageExtension(false, extKeyUsageSlice).SetAKIDExtensionFromKey(false, defaultCertificateParams.Intermed1CAPubkey).SetSKIDExtensionFromKey(false, defaultCertificateParams.LeafPubkey).SetSANExtension(false, []string{"BADCERT-LEAF.cisco.com"}, nil, nil, nil))
+        return(badcert.CreateExtensions().SetBasicConstraintsExtension(true, false, 0, false).SetKeyUsageExtension(false, badcert.KeyUsageDigitalSignature|badcert.KeyUsageKeyEncipherment).SetExtKeyUsageExtension(false, extKeyUsageSlice).SetAKIDExtensionFromKey(false, defaultCertificateParams.Intermed1CAPubkey).SetSKIDExtensionFromKey(false, defaultCertificateParams.LeafPubkey).SetSANExtension(false, []string{"BADCERT-LEAF.cisco.com"}, nil, nil, nil))
 }
 
 func BuildDefaultRootCARecipe() (*badcert.BadCertificate) {
