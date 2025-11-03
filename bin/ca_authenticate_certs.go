@@ -44,22 +44,7 @@ Requirements for a Good Self Signed CA Certificates
 14)Sigalgo field in TBSCert should match with the field in Certificate 
 15)AKID extension is not mandatory. But if present, must not be set to critical 
 16)SKID extension must be present, and must not be set to critical
-
-Requirements for a Good Leaf Certificates 
-1)Version must be 3 
-2)If KeyUsage extension is present, it must not contain keyCertSign bit 
-3)If BasicConstraints extensions is present, CA must be set to false 
-4)Pathlen must not be present 
-5) Issuer name must not be empty 
-6) If there is no SAN set, then subject name must not be empty 
-7) If the subject name is empty and SAN is set, then SAN must be critical 
-8) If SAN is present, it should contain atleast one name 
-9) Sig Algo field in TBSCert must match with the sig alg field in Certificate 
-10) AKID must be present, contain a KeyId, and must not be critical 
-11) SKID is not mandatory, but if present, must not be critical 
 */
-
-
 
 
 /*
@@ -78,7 +63,7 @@ func CA_AUTHENTICATE_CERT_1(outputDirectory string) {
 	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
 	for index, badCertificateChain = range *badCertificateChains {
 	        testCertData := CreateTestCertData(badCertificateChain)
-                testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CUSTOM-CERT-1-CAT1-%d.json", outputDirectory, index))
+                testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CA-AUTH-CERT-1-CAT1-%d.json", outputDirectory, index))
 	}
 }
 
@@ -99,7 +84,7 @@ func CA_AUTHENTICATE_CERT_2(outputDirectory string) {
 	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
 	for index, badCertificateChain = range *badCertificateChains {
 		testCertData := CreateTestCertData(badCertificateChain)
-                testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CUSTOM-CERT-2-CAT1-%d.json", outputDirectory, index))
+                testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CA-AUTH-CERT-2-CAT1-%d.json", outputDirectory, index))
 	}
 }
 
@@ -126,7 +111,7 @@ func CA_AUTHENTICATE_CERT_3(outputDirectory string) {
 	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
 	for index, badCertificateChain = range *badCertificateChains {
                 testCertData := CreateTestCertData(badCertificateChain)
-                testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CUSTOM-CERT-3-CAT1-%d.json", outputDirectory, index))	
+                testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CA-AUTH-CERT-3-CAT1-%d.json", outputDirectory, index))	
 	}
 }
 
@@ -153,7 +138,7 @@ func CA_AUTHENTICATE_CERT_4(outputDirectory string) {
 	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
 	for index, badCertificateChain = range *badCertificateChains {
 	        testCertData := CreateTestCertData(badCertificateChain)
-                testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CUSTOM-CERT-4-CAT1-%d.json", outputDirectory, index))	
+                testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CA-AUTH-CERT-4-CAT1-%d.json", outputDirectory, index))	
 	}
 }
 
@@ -179,7 +164,7 @@ func CA_AUTHENTICATE_CERT_5(outputDirectory string) {
 	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
 	for index, badCertificateChain = range *badCertificateChains {
 	        testCertData := CreateTestCertData(badCertificateChain)
-                testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CUSTOM-CERT-5-CAT1-%d.json", outputDirectory, index))	
+                testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CA-AUTH-CERT-5-CAT1-%d.json", outputDirectory, index))	
 	}
 }
 
@@ -206,7 +191,7 @@ func CA_AUTHENTICATE_CERT_6(outputDirectory string) {
 	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
 	for index, badCertificateChain = range *badCertificateChains {
 	        testCertData := CreateTestCertData(badCertificateChain)
-                testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CUSTOM-CERT-6-CAT1-%d.json", outputDirectory, index))	
+                testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CA-AUTH-CERT-6-CAT1-%d.json", outputDirectory, index))	
 	}
 
 }
@@ -233,7 +218,7 @@ func CA_AUTHENTICATE_CERT_7(outputDirectory string) {
 	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
 	for index, badCertificateChain = range *badCertificateChains {
 	        testCertData := CreateTestCertData(badCertificateChain)
-                testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CUSTOM-CERT-7-CAT1-%d.json", outputDirectory, index))	
+                testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CA-AUTH-CERT-7-CAT1-%d.json", outputDirectory, index))	
 	}
 }
 
@@ -259,7 +244,7 @@ func CA_AUTHENTICATE_CERT_8(outputDirectory string) {
 	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
 	for index, badCertificateChain = range *badCertificateChains {
 	        testCertData := CreateTestCertData(badCertificateChain)
-                testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CUSTOM-CERT-8-CAT1-%d.json", outputDirectory, index))	
+                testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CA-AUTH-CERT-8-CAT1-%d.json", outputDirectory, index))	
 	}
 }
 
@@ -280,7 +265,7 @@ func CA_AUTHENTICATE_CERT_9(outputDirectory string) {
 	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
 	for index, badCertificateChain = range *badCertificateChains {
 		testCertData := CreateTestCertData(badCertificateChain)
-                testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CUSTOM-CERT-9-CAT1-%d.json", outputDirectory, index))
+                testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CA-AUTH-CERT-9-CAT1-%d.json", outputDirectory, index))
 	}
 }
 
@@ -300,7 +285,7 @@ func CA_AUTHENTICATE_CERT_10(outputDirectory string) {
 	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
 	for index, badCertificateChain = range *badCertificateChains {
 		testCertData := CreateTestCertData(badCertificateChain)
-                testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CUSTOM-CERT-10-CAT1-%d.json", outputDirectory, index))
+                testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CA-AUTH-CERT-10-CAT1-%d.json", outputDirectory, index))
 	}
 }
 
@@ -327,7 +312,7 @@ func CA_AUTHENTICATE_CERT_11(outputDirectory string) {
 	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
 	for index, badCertificateChain = range *badCertificateChains {
 	        testCertData := CreateTestCertData(badCertificateChain)
-                testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CUSTOM-CERT-11-CAT1-%d.json", outputDirectory, index))	
+                testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CA-AUTH-CERT-11-CAT1-%d.json", outputDirectory, index))	
 	}
 }
 
@@ -348,7 +333,7 @@ func CA_AUTHENTICATE_CERT_12(outputDirectory string) {
 	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
 	for index, badCertificateChain = range *badCertificateChains {
 		testCertData := CreateTestCertData(badCertificateChain)
-                testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CUSTOM-CERT-12-CAT1-%d.json", outputDirectory, index))
+                testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CA-AUTH-CERT-12-CAT1-%d.json", outputDirectory, index))
 	}
 }
 
@@ -374,7 +359,7 @@ func CA_AUTHENTICATE_CERT_13(outputDirectory string) {
 	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
 	for index, badCertificateChain = range *badCertificateChains {
 	        testCertData := CreateTestCertData(badCertificateChain)
-                testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CUSTOM-CERT-13-CAT1-%d.json", outputDirectory, index))	
+                testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CA-AUTH-CERT-13-CAT1-%d.json", outputDirectory, index))	
 	}
 }
 
@@ -400,7 +385,7 @@ func CA_AUTHENTICATE_CERT_14(outputDirectory string) {
 	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
 	for index, badCertificateChain = range *badCertificateChains {
 	        testCertData := CreateTestCertData(badCertificateChain)
-                testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CUSTOM-CERT-14-CAT1-%d.json", outputDirectory, index))	
+                testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CA-AUTH-CERT-14-CAT1-%d.json", outputDirectory, index))	
 	}
 }
 
@@ -427,7 +412,7 @@ func CA_AUTHENTICATE_CERT_15(outputDirectory string) {
 	goodLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
         certChain := CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, true, false, true, goodLeafRecipe,badIntermed1CARecipe,goodRootCARecipe)
 	testCertData := CreateTestCertData(certChain)
-        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CUSTOM-CERT-15-CAT1-%d.json", outputDirectory, index))	
+        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CA-AUTH-CERT-15-CAT1-%d.json", outputDirectory, index))	
 }
 
 /*
@@ -453,7 +438,7 @@ func CA_AUTHENTICATE_CERT_16(outputDirectory string) {
 	goodLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
         certChain := CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, true, false, true, goodLeafRecipe,badIntermed1CARecipe,goodRootCARecipe)
 	testCertData := CreateTestCertData(certChain)
-        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CUSTOM-CERT-16-CAT1-%d.json", outputDirectory, index))	
+        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CA-AUTH-CERT-16-CAT1-%d.json", outputDirectory, index))	
 }
 */
 
@@ -481,7 +466,7 @@ func CA_AUTHENTICATE_CERT_17(outputDirectory string) {
 	goodLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
         certChain := CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, true, false, true, goodLeafRecipe,badIntermed1CARecipe,goodRootCARecipe)
 	testCertData := CreateTestCertData(certChain)
-        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CUSTOM-CERT-17-CAT1-%d.json", outputDirectory, index))	
+        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CA-AUTH-CERT-17-CAT1-%d.json", outputDirectory, index))	
 }
 
 /*
@@ -507,7 +492,7 @@ func CA_AUTHENTICATE_CERT_18(outputDirectory string) {
 	goodLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
         certChain := CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, false, true, true, goodLeafRecipe,goodIntermed1CARecipe,badRootCARecipe)
 	testCertData := CreateTestCertData(certChain)
-        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CUSTOM-CERT-18-CAT1-%d.json", outputDirectory, index))	
+        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CA-AUTH-CERT-18-CAT1-%d.json", outputDirectory, index))	
 }
 
 
