@@ -150,9 +150,9 @@ func ExtractCertRequestFields(certRequest *badcert.CertificateRequest) (*Certifi
 
        certRequestFields.KeyUsage = GetRequestedKeyUsageFromCSR(certRequest)
        if certRequestFields.KeyUsage != nil {
-           fmt.Printf("\nRequested key usage = %d\n", *certRequestFields.KeyUsage)
+           fmt.Printf("Requested key usage = %d", *certRequestFields.KeyUsage)
        } else {
-	   fmt.Printf("\nNo key usage bits requested\n")
+	   fmt.Printf("No key usage bits requested")
        }
 
        sanExtension = badcert.ExtensionSlice(certRequest.Extensions).GetSANExtension()
