@@ -125,8 +125,16 @@ func GetRequestedKeyUsageFromCSR(certificateRequest *badcert.CertificateRequest)
 	}
         
 	//All of the defined key usage bits are present in the first bit.
-	keyUsage = badcert.KeyUsage(keyUsageBitString.Bytes[0])
+	keyUsage = badcert.KeyUsage(reverseByte(keyUsageBitString.Bytes[0]))
         return &keyUsage
+}
+
+func reverseByte(keyUsageBitString byte) (byte) {
+	var reversedKeyUsageBitString byte
+	for i := 0; i < 8; i++ {
+		reversedKeyUsageBitString = (reversedKeyUsageBitString << 1) | ((keyUsageBitString >> i) & 1)
+	}
+	return reversedKeyUsageBitString
 }
 
 func ExtractCertRequestFields(certRequest *badcert.CertificateRequest) (*CertificateRequestFields) {
@@ -142,7 +150,9 @@ func ExtractCertRequestFields(certRequest *badcert.CertificateRequest) (*Certifi
 
        certRequestFields.KeyUsage = GetRequestedKeyUsageFromCSR(certRequest)
        if certRequestFields.KeyUsage != nil {
-           fmt.Printf("Requested key usage = %d", *certRequestFields.KeyUsage)
+           fmt.Printf("\nRequested key usage = %d\n", *certRequestFields.KeyUsage)
+       } else {
+	   fmt.Printf("\nNo key usage bits requested\n")
        }
 
        sanExtension = badcert.ExtensionSlice(certRequest.Extensions).GetSANExtension()

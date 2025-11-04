@@ -158,18 +158,31 @@ func SignRequestBadCertLeafKeyusageKeycertsign(signRequestCertOutputDirectory st
 
        certRequest = ReadCertificateRequest(certRequestPath)
        certRequestFields = ExtractCertRequestFields(certRequest)
-
+         
        certProfileDescription := "Leaf Cert contains keyCertSign bit in Key Usage extension"
        
+       modifiedKeyUsage := badcert.KeyUsageCertSign
+       if certRequestFields.KeyUsage != nil {
+	       modifiedKeyUsage = modifiedKeyUsage | (*certRequestFields.KeyUsage)
+       }
+
        if certRequestSigner == CERT_REQUEST_SIGNER_ROOT {
                badLeafRecipe := BuildLeafCertFromCertRequest(certRequestFields, &rootCACert.Subject, rootCACert.SubjectKeyId)
-	       modifiedLeafExtensions := badLeafRecipe.GetExtensions().SetKeyUsageExtension(false, badcert.KeyUsageDigitalSignature|badcert.KeyUsageKeyEncipherment|badcert.KeyUsageCertSign)
+	       modifiedLeafExtensions := badLeafRecipe.GetExtensions()
+               if certRequestFields.KeyUsage != nil {
+		       modifiedLeafExtensions = modifiedLeafExtensions.UnsetKeyUsageExtension()
+               }
+	       modifiedLeafExtensions = modifiedLeafExtensions.SetKeyUsageExtension(false, modifiedKeyUsage)
 	       badLeafRecipe.SetExtensions(modifiedLeafExtensions)
 	       badLeafRecipe.SignTBS(rootCAKey, defaultCertificateParams.SignatureAlgorithm)
                certChain = CreateBadCertificateChain(certProfileDescription, nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(rootCACert)) 
        } else if certRequestSigner == CERT_REQUEST_SIGNER_INTERMED1 {
                badLeafRecipe := BuildLeafCertFromCertRequest(certRequestFields, &intermed1CACert.Subject, intermed1CACert.SubjectKeyId)
-	       modifiedLeafExtensions := badLeafRecipe.GetExtensions().SetKeyUsageExtension(false, badcert.KeyUsageDigitalSignature|badcert.KeyUsageKeyEncipherment|badcert.KeyUsageCertSign)
+	       modifiedLeafExtensions := badLeafRecipe.GetExtensions()
+	       if certRequestFields.KeyUsage != nil {
+		       modifiedLeafExtensions = modifiedLeafExtensions.UnsetKeyUsageExtension()
+               }
+	       modifiedLeafExtensions = modifiedLeafExtensions.SetKeyUsageExtension(false, modifiedKeyUsage)
 	       badLeafRecipe.SetExtensions(modifiedLeafExtensions)
 	       badLeafRecipe.SignTBS(intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
                certChain = CreateBadCertificateChain(certProfileDescription, nil, true, true, false, badLeafRecipe, badcert.CreateBadCertificateFromCertificate(intermed1CACert), badcert.CreateBadCertificateFromCertificate(rootCACert))  

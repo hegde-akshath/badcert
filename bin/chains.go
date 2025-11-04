@@ -31,7 +31,7 @@ func WriteBadCertChain(badCertificateChain BadCertificateChain, filepath string)
 func GenerateCertificateProfileDescription(certProfileBaseDescription string, isRootCACertValid bool, isIntermedCACertChainValid bool, isLeafCertValid bool) string {
 	boolToString := map[bool]string{true: "Contains good cert", false: "Contains bad cert"}
 	
-	return certProfileBaseDescription + fmt.Sprintf(" Root CA: %s, Intermediate CA Cert Chain: %s, Leaf: %s", boolToString[isRootCACertValid],
+	return certProfileBaseDescription + "\n" + fmt.Sprintf("Root CA: %s\nIntermediate CA Cert Chain: %s\nLeaf: %s", boolToString[isRootCACertValid],
 	       boolToString[isIntermedCACertChainValid], boolToString[isLeafCertValid])
 }
 
