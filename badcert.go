@@ -82,6 +82,8 @@ type BadCertValidity struct {
 	NotAfter time.Time
 }
 
+//TODO: To check if extenion slice can be moved into this and the interface to BadCert itself manages the extensions rather than having to explicitly modify extensions and set into
+//certificate
 type BadCertificate struct {	
 	tbscert *tbsCertificate
         x509Certificate *Certificate
@@ -377,6 +379,13 @@ func (extensions ExtensionSlice) UnsetBasicConstraintsExtension()(ExtensionSlice
         return((ExtensionSlice)(modifiedExtensions))
 }
 
+func (extensions ExtensionSlice) GetKeyUsageExtension() (*pkix.Extension) {
+        index := SearchExtension(extensions, oidExtensionKeyUsage)
+	if index == -1 {
+		return nil
+	}
+	return &extensions[index]
+}
 
 func (extensions ExtensionSlice) SetKeyUsageExtension(critical bool, keyUsage KeyUsage)(ExtensionSlice) {
 	var err error
@@ -488,6 +497,15 @@ func (extensions ExtensionSlice) UnsetSKIDExtension()(ExtensionSlice) {
 
 	modifiedExtensions = append(([]pkix.Extension)(extensions[:index]), ([]pkix.Extension)(extensions[index + 1:])...)
         return((ExtensionSlice)(modifiedExtensions))
+}
+
+
+func (extensions ExtensionSlice) GetSANExtension() (*pkix.Extension) {
+        index := SearchExtension(extensions, oidExtensionSubjectAltName)
+	if index == -1 {
+		return nil
+	}
+	return &extensions[index]
 }
 
 func (extensions ExtensionSlice) SetSANExtension(critical bool, DNSNames []string, EmailAddresses []string, IPAddresses []net.IP, URIs []*url.URL) (ExtensionSlice) {
