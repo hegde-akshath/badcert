@@ -79,7 +79,7 @@ func LoadKey(filepath string) (crypto.PrivateKey) {
     return key    
 }
 
-func ReadCertificateRequest(requestFilePath string) (*badcert.CertificateRequest) {
+func LoadCertificateRequest(requestFilePath string) (*badcert.CertificateRequest) {
 	csrPem, err := os.ReadFile(requestFilePath)
         if err != nil {
 		panic(err)
@@ -101,6 +101,24 @@ func ReadCertificateRequest(requestFilePath string) (*badcert.CertificateRequest
 	}
 
         return certRequest
+}
+
+func LoadCertificate(certFilePath string) (*badcert.Certificate) {
+        certPem, err := os.ReadFile(certFilePath)
+        if err != nil {
+		panic(err)
+        }
+
+	certDer, _ := pem.Decode(certPem)
+	if certDer == nil {
+                panic(errors.New("Failed to extract first PEM block in certificate file"))
+	}
+
+	cert, err := badcert.ParseCertificate(certDer.Bytes)
+	if err != nil {
+		panic(err)
+        }
+	return cert
 }
 
 func GetRequestedKeyUsageFromCSR(certificateRequest *badcert.CertificateRequest) (*badcert.KeyUsage) {
@@ -192,20 +210,4 @@ func BuildLeafCertFromCertRequest(certRequestFields *CertificateRequestFields, i
 }
 
 
-func ReadCertificate(certFilePath string) (*badcert.Certificate) {
-        certPem, err := os.ReadFile(certFilePath)
-        if err != nil {
-		panic(err)
-        }
 
-	certDer, _ := pem.Decode(certPem)
-	if certDer == nil {
-                panic(errors.New("Failed to extract first PEM block in certificate file"))
-	}
-
-	cert, err := badcert.ParseCertificate(certDer.Bytes)
-	if err != nil {
-		panic(err)
-        }
-	return cert
-}

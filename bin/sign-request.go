@@ -57,8 +57,8 @@ func loadDefaultCAKeys(defaultCADirectoryPath string) (crypto.PrivateKey, crypto
 }
 
 func loadDefaultCACerts(defaultCADirectoryPath string) (*badcert.Certificate, *badcert.Certificate) {
-        rootCACert      := ReadCertificate(fmt.Sprintf("%s/root-ca-cert.pem", defaultCADirectoryPath))
-        intermed1CACert := ReadCertificate(fmt.Sprintf("%s/intermed1-ca-cert.pem", defaultCADirectoryPath))
+        rootCACert      := LoadCertificate(fmt.Sprintf("%s/root-ca-cert.pem", defaultCADirectoryPath))
+        intermed1CACert := LoadCertificate(fmt.Sprintf("%s/intermed1-ca-cert.pem", defaultCADirectoryPath))
 	return rootCACert, intermed1CACert
 }
 
@@ -72,7 +72,7 @@ func SignRequestBadCertLeafVersion1(signRequestCertOutputDirectory string, certR
        var certRequestFields *CertificateRequestFields
        var certChain BadCertificateChain
 
-       certRequest = ReadCertificateRequest(certRequestPath)
+       certRequest = LoadCertificateRequest(certRequestPath)
        certRequestFields = ExtractCertRequestFields(certRequest)
 
        certProfileDescription := "Leaf Cert Version is 1"
@@ -100,7 +100,7 @@ func SignRequestBadCertLeafVersion2(signRequestCertOutputDirectory string, certR
        var certRequestFields *CertificateRequestFields
        var certChain BadCertificateChain
 
-       certRequest = ReadCertificateRequest(certRequestPath)
+       certRequest = LoadCertificateRequest(certRequestPath)
        certRequestFields = ExtractCertRequestFields(certRequest)
 
        certProfileDescription := "Leaf Cert Version is 2"
@@ -127,7 +127,7 @@ func SignRequestBadCertLeafBasicConstraintsCATrue(signRequestCertOutputDirectory
        var certRequestFields *CertificateRequestFields
        var certChain BadCertificateChain
 
-       certRequest = ReadCertificateRequest(certRequestPath)
+       certRequest = LoadCertificateRequest(certRequestPath)
        certRequestFields = ExtractCertRequestFields(certRequest)
 
        certProfileDescription := "Leaf Cert contains CA = true in Basic Constraints extension"
@@ -156,7 +156,7 @@ func SignRequestBadCertLeafKeyusageKeycertsign(signRequestCertOutputDirectory st
        var certRequestFields *CertificateRequestFields
        var certChain BadCertificateChain
 
-       certRequest = ReadCertificateRequest(certRequestPath)
+       certRequest = LoadCertificateRequest(certRequestPath)
        certRequestFields = ExtractCertRequestFields(certRequest)
          
        certProfileDescription := "Leaf Cert contains keyCertSign bit in Key Usage extension"
@@ -199,7 +199,7 @@ func SignRequestBadCertLeafPathlenPresent(signRequestCertOutputDirectory string,
        var certRequestFields *CertificateRequestFields
        var certChain BadCertificateChain
 
-       certRequest = ReadCertificateRequest(certRequestPath)
+       certRequest = LoadCertificateRequest(certRequestPath)
        certRequestFields = ExtractCertRequestFields(certRequest)
  
        certProfileDescription := "Leaf Cert contains pathlen attribute in Basic Constraints extension"
@@ -228,7 +228,7 @@ func SignRequestBadCertLeafEmptyIssuer(signRequestCertOutputDirectory string, ce
        var certRequestFields *CertificateRequestFields
        var certChain BadCertificateChain
 
-       certRequest = ReadCertificateRequest(certRequestPath)
+       certRequest = LoadCertificateRequest(certRequestPath)
        certRequestFields = ExtractCertRequestFields(certRequest)
  
        certProfileDescription := "Leaf Cert contains empty issuer field"
@@ -252,7 +252,7 @@ func SignRequestBadCertLeafNoSanEmptySubject(signRequestCertOutputDirectory stri
        var certRequestFields *CertificateRequestFields
        var certChain BadCertificateChain
 
-       certRequest = ReadCertificateRequest(certRequestPath)
+       certRequest = LoadCertificateRequest(certRequestPath)
        certRequestFields = ExtractCertRequestFields(certRequest)
 
        certProfileDescription := "Leaf cert has no SAN extension but subject field is empty as well"
@@ -286,7 +286,7 @@ func SignRequestBadCertLeafNoSubjectSanNotCritical(signRequestCertOutputDirector
        var certRequestFields *CertificateRequestFields
        var certChain BadCertificateChain
 
-       certRequest = ReadCertificateRequest(certRequestPath)
+       certRequest = LoadCertificateRequest(certRequestPath)
        certRequestFields = ExtractCertRequestFields(certRequest)
 
        if certRequestFields.IsSANSet == false {
@@ -316,7 +316,7 @@ func SignRequestBadCertLeafSanPresentButEmpty(signRequestCertOutputDirectory str
        var certRequestFields *CertificateRequestFields
        var certChain BadCertificateChain
 
-       certRequest = ReadCertificateRequest(certRequestPath)
+       certRequest = LoadCertificateRequest(certRequestPath)
        certRequestFields = ExtractCertRequestFields(certRequest)
 
        certProfileDescription := "Leaf cert contains SAN extension but it is empty"
@@ -354,7 +354,7 @@ func SignRequestBadCertLeafSigalgMismatch(signRequestCertOutputDirectory string,
        var certRequestFields *CertificateRequestFields
        var certChain BadCertificateChain
 
-       certRequest = ReadCertificateRequest(certRequestPath)
+       certRequest = LoadCertificateRequest(certRequestPath)
        certRequestFields = ExtractCertRequestFields(certRequest)
 
        certProfileDescription := "Leaf cert sigalg field doesn't match the algorithm field in signature"
@@ -378,7 +378,7 @@ func SignRequestBadCertLeafAKIDNotPresent(signRequestCertOutputDirectory string,
        var certRequestFields *CertificateRequestFields
        var certChain BadCertificateChain
 
-       certRequest = ReadCertificateRequest(certRequestPath)
+       certRequest = LoadCertificateRequest(certRequestPath)
        certRequestFields = ExtractCertRequestFields(certRequest)
 
        certProfileDescription := "Leaf cert doesn't contain AKID extension"
@@ -406,7 +406,7 @@ func SignRequestBadCertLeafAKIDNoKeyid(signRequestCertOutputDirectory string, ce
        var certRequestFields *CertificateRequestFields
        var certChain BadCertificateChain
 
-       certRequest = ReadCertificateRequest(certRequestPath)
+       certRequest = LoadCertificateRequest(certRequestPath)
        certRequestFields = ExtractCertRequestFields(certRequest)
 
        certProfileDescription := "Leaf cert contains no KeyId in AKID extension"
@@ -435,7 +435,7 @@ func SignRequestBadCertLeafAKIDCritical(signRequestCertOutputDirectory string, c
        var certRequestFields *CertificateRequestFields
        var certChain BadCertificateChain
 
-       certRequest = ReadCertificateRequest(certRequestPath)
+       certRequest = LoadCertificateRequest(certRequestPath)
        certRequestFields = ExtractCertRequestFields(certRequest)
 
        certProfileDescription := "Leaf cert contains AKID extension marked as critical"
@@ -463,7 +463,7 @@ func SignRequestBadCertLeafSKIDCritical(signRequestCertOutputDirectory string, c
        var certRequestFields *CertificateRequestFields
        var certChain BadCertificateChain
 
-       certRequest = ReadCertificateRequest(certRequestPath)
+       certRequest = LoadCertificateRequest(certRequestPath)
        certRequestFields = ExtractCertRequestFields(certRequest)
 
        certProfileDescription := "Leaf cert contains SKID extension marked as critical"

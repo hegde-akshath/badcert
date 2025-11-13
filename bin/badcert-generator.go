@@ -13,7 +13,7 @@ var defaultCertificateParams *DefaultCertificateParams
 
 
 func main() {
-	commandType         := flag.String("command", "ca-authenticate-certs", "Command To run(ca-authenticate-certs | ssl-certs | sign-request | rfc-5280-certs)")
+	commandType         := flag.String("command", "ca-authenticate-certs", "Command To run(ca-authenticate-certs | ssl-certs | sign-request | rfc-5280-certs | peer-name-validation-certs | get-ca-details)")
 	certOutputDirectory := flag.String("cert_dir", "certs/", "Certificate output directory path")
 	certRequestType     := flag.Int("cert_request_type", int(LEAF_CERT_VERSION_1), "Type of leaf certificate to create during signing")
 	certRequestPath     := flag.String("cert_request_path", "req.pem", "Path to certificate signing request file")
@@ -38,6 +38,12 @@ func main() {
 	} else if (*commandType == "sign-request") {
 		signRequestCertOutputDirectory := fmt.Sprintf("%s/sign-request/", absPath)
 		SignRequest(*defaultCADirectory, signRequestCertOutputDirectory, CertRequestType(*certRequestType), *certRequestPath, CertRequestSigner(*certRequestSigner))
+	} else if (*commandType == "get-ca-details") {
+	        getCADetailsOutputDirectory := fmt.Sprintf("%s/get-ca-details/", absPath)
+		GetCADetails(*defaultCADirectory, getCADetailsOutputDirectory)
+	} else if (*commandType == "peer-name-validation-certs") {
+		peerNameValidationCertOutputDirectory := fmt.Sprintf("%s/peer-name-validation/", absPath)
+		GeneratePeerNameValidationCerts(peerNameValidationCertOutputDirectory)
 	} else {
 		panic(errors.New("Invalid command type"))
 	}
