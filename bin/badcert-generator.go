@@ -19,6 +19,10 @@ func main() {
 	certRequestPath     := flag.String("cert_request_path", "req.pem", "Path to certificate signing request file")
 	certRequestSigner   := flag.Int("cert_request_signer", int(CERT_REQUEST_SIGNER_ROOT), "Key to use for signing certificate request file")
 	defaultCADirectory  := flag.String("default_ca_dir", "CA/", "Default CA Directory Path")
+	leafPrivateKeyPath  := flag.String("leaf_private_key_path", "", "leaf Private Key Path")
+	subjectCN           := flag.String("subject_cn", "", "Subject CN")
+	sanDNS              := flag.String("san_dns", "", "SAN DNS Name")
+	sanIP               := flag.String("san_ip", "", "SAN IP")
 	flag.Parse()
         
         absPath, _ := filepath.Abs(*certOutputDirectory)
@@ -43,7 +47,7 @@ func main() {
 		GetCADetails(*defaultCADirectory, getCADetailsOutputDirectory)
 	} else if (*commandType == "peer-name-validation-certs") {
 		peerNameValidationCertOutputDirectory := fmt.Sprintf("%s/peer-name-validation/", absPath)
-		GeneratePeerNameValidationCerts(peerNameValidationCertOutputDirectory)
+		GeneratePeerNameValidationCerts(*defaultCADirectory, peerNameValidationCertOutputDirectory, *leafPrivateKeyPath, CertRequestSigner(*certRequestSigner), *subjectCN, *sanDNS, *sanIP)
 	} else {
 		panic(errors.New("Invalid command type"))
 	}

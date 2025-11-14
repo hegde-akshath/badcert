@@ -31,7 +31,7 @@ func loadIntermed1CA(caDirectoryPath string) (crypto.PrivateKey, *badcert.Certif
         return intermed1CAKey, intermed1CACert
 }
 
-func CreateCADetails(caDirectory string, getCADetailsOutputDirectory string) (*CADetails) {
+func CreateCADetails(caDirectory string) (*CADetails) {
 	var caDetails CADetails
 	var buf bytes.Buffer
 
@@ -107,7 +107,7 @@ func (caDetails *CADetails) WriteCADetailsJson(filepath string) {
 
 func GetCADetails(caDirectory string, getCADetailsOutputDirectory string) {
 	CreateDirectory(getCADetailsOutputDirectory)
-	caDetails := CreateCADetails(caDirectory, getCADetailsOutputDirectory)
+	caDetails := CreateCADetails(caDirectory)
 	filepath := fmt.Sprintf("%s/CA-DETAILS.json", getCADetailsOutputDirectory)
 	caDetails.WriteCADetailsJson(filepath)
 }

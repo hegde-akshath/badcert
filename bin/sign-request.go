@@ -33,7 +33,8 @@ const (
 )
 
 const (
-	LEAF_CERT_VERSION_1 CertRequestType = iota
+	LEAF_CERT_GOOD CertRequestType = iota
+	LEAF_CERT_VERSION_1 
 	LEAF_CERT_VERSION_2
 	LEAF_CERT_BASIC_CONSTRAINTS_CA_TRUE
 	LEAF_CERT_KEYUSAGE_KEYCERTSIGN
@@ -50,17 +51,42 @@ const (
 )
 
 
-func loadDefaultCAKeys(defaultCADirectoryPath string) (crypto.PrivateKey, crypto.PrivateKey) {
-	rootCAKey      := LoadKey(fmt.Sprintf("%s/root-ca-key.pem", defaultCADirectoryPath))
-	intermed1CAKey := LoadKey(fmt.Sprintf("%s/intermed1-ca-key.pem", defaultCADirectoryPath))
+func loadDefaultCAKeys(caDirectoryPath string) (crypto.PrivateKey, crypto.PrivateKey) {
+	rootCAKey      := LoadKey(fmt.Sprintf("%s/root-ca-key.pem", caDirectoryPath))
+	intermed1CAKey := LoadKey(fmt.Sprintf("%s/intermed1-ca-key.pem", caDirectoryPath))
 	return rootCAKey, intermed1CAKey
 }
 
-func loadDefaultCACerts(defaultCADirectoryPath string) (*badcert.Certificate, *badcert.Certificate) {
-        rootCACert      := LoadCertificate(fmt.Sprintf("%s/root-ca-cert.pem", defaultCADirectoryPath))
-        intermed1CACert := LoadCertificate(fmt.Sprintf("%s/intermed1-ca-cert.pem", defaultCADirectoryPath))
+func loadDefaultCACerts(caDirectoryPath string) (*badcert.Certificate, *badcert.Certificate) {
+        rootCACert      := LoadCertificate(fmt.Sprintf("%s/root-ca-cert.pem", caDirectoryPath))
+        intermed1CACert := LoadCertificate(fmt.Sprintf("%s/intermed1-ca-cert.pem", caDirectoryPath))
 	return rootCACert, intermed1CACert
 }
+
+func SignRequestGoodLeafCert(signRequestCertOutputDirectory string, certRequestPath string, certRequestSigner CertRequestSigner, rootCAKey crypto.PrivateKey, intermed1CAKey crypto.PrivateKey, rootCACert *badcert.Certificate, intermed1CACert *badcert.Certificate) {
+       var certRequest *badcert.CertificateRequest
+       var certRequestFields *CertificateRequestFields
+       var certChain BadCertificateChain
+
+       certRequest = LoadCertificateRequest(certRequestPath)
+       certRequestFields = ExtractCertRequestFields(certRequest)
+
+       certProfileDescription := "Good Leaf Cert"
+        
+       if certRequestSigner == CERT_REQUEST_SIGNER_ROOT {
+	       goodLeafRecipe := BuildLeafCertFromCertRequest(certRequestFields, &rootCACert.Subject, rootCACert.SubjectKeyId)
+               goodLeafRecipe.SignTBS(rootCAKey, defaultCertificateParams.SignatureAlgorithm)
+               certChain = CreateBadCertificateChain(certProfileDescription, nil, true, true, false, goodLeafRecipe, badcert.CreateBadCertificateFromCertificate(rootCACert))
+       } else if certRequestSigner == CERT_REQUEST_SIGNER_INTERMED1 {
+	       goodLeafRecipe := BuildLeafCertFromCertRequest(certRequestFields, &intermed1CACert.Subject, intermed1CACert.SubjectKeyId)
+               goodLeafRecipe.SignTBS(intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
+               certChain = CreateBadCertificateChain(certProfileDescription, nil, true, true, false, goodLeafRecipe, badcert.CreateBadCertificateFromCertificate(intermed1CACert), badcert.CreateBadCertificateFromCertificate(rootCACert))
+       }
+
+       testCertData := CreateTestCertData(certChain)      
+       testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/GOOD-LEAF-CERT.json", signRequestCertOutputDirectory))
+}
+
 
 
 //TODO: Instead of this, need to create a CA on request, and use from there
@@ -488,14 +514,17 @@ func SignRequestBadCertLeafSKIDCritical(signRequestCertOutputDirectory string, c
 
 
 
-func SignRequest(defaultCADirectory string, signRequestCertOutputDirectory string, certRequestType CertRequestType, certRequestPath string, certRequestSigner CertRequestSigner) {
+func SignRequest(caDirectory string, signRequestCertOutputDirectory string, certRequestType CertRequestType, certRequestPath string, certRequestSigner CertRequestSigner) {
 	CreateDirectory(signRequestCertOutputDirectory)
 
 	//NOTE, we also need to pass the correct sigalgo parameter to this
-        rootCAKey, intermed1CAKey   := loadDefaultCAKeys(defaultCADirectory)
-	rootCACert, intermed1CACert := loadDefaultCACerts(defaultCADirectory)
-	
-	if (certRequestType == LEAF_CERT_VERSION_1) {
+        rootCAKey, intermed1CAKey   := loadDefaultCAKeys(caDirectory)
+	rootCACert, intermed1CACert := loadDefaultCACerts(caDirectory)
+        
+	if (certRequestType == LEAF_CERT_GOOD) {
+		fmt.Println("Generating Good Leaf Certificate")
+		SignRequestGoodLeafCert(signRequestCertOutputDirectory, certRequestPath, certRequestSigner, rootCAKey, intermed1CAKey, rootCACert, intermed1CACert)
+	} else if (certRequestType == LEAF_CERT_VERSION_1) {
 		fmt.Println("Generating Leaf Certificate with Version 1")
 		SignRequestBadCertLeafVersion1(signRequestCertOutputDirectory, certRequestPath, certRequestSigner, rootCAKey, intermed1CAKey, rootCACert, intermed1CACert)
 	} else if (certRequestType == LEAF_CERT_VERSION_2) {
