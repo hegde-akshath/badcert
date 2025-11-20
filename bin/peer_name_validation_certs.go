@@ -24,6 +24,9 @@ Applicable To: Intermediate CA
 */
 func PEER_NAME_VALIDATION_CERT(caDirectory string, outputDirectory string, leafPrivateKeyPath string, certRequestSigner CertRequestSigner, subjectCN string, sanDNS string, sanIP string) { 
 	var certChain BadCertificateChain
+	var sanDNSSlice []string
+	var sanIPSlice []net.IP
+
 	leafPrivateKey := LoadKey(leafPrivateKeyPath)
         
 	//NOTE, we also need to pass the correct sigalgo parameter to this
@@ -33,18 +36,35 @@ func PEER_NAME_VALIDATION_CERT(caDirectory string, outputDirectory string, leafP
 	certProfileDescription := "Peer Name Validation"
         
 	_, leafPubKey := badcert.GetSignerFromKey(leafPrivateKey)
+        
+	if sanDNS != "" {
+		sanDNSSlice = []string{sanDNS}
+	} else {
+		sanDNSSlice = nil
+	}
 
+	if sanIP != "" {
+		sanIPSlice = []net.IP{net.ParseIP(sanIP)}
+	} else {
+		sanIPSlice = nil
+	}
 	
         if certRequestSigner == CERT_REQUEST_SIGNER_ROOT {
 		defaultLeafRecipe := BuildDefaultLeafRecipe().SetIssuer(&rootCACert.Subject).SetSubject(&pkix.Name{CommonName: subjectCN}).SetCertificatePublicKey(leafPubKey)
-		modifiedLeafExtensions := defaultLeafRecipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, []string{sanDNS}, nil, []net.IP{net.ParseIP(sanIP)}, nil).UnsetAKIDExtension().SetAKIDExtension(false, rootCACert.SubjectKeyId).UnsetSKIDExtension().SetSKIDExtensionFromKey(false, leafPubKey)
-	        defaultLeafRecipe.SetExtensions(modifiedLeafExtensions)
+		modifiedLeafExtensions := defaultLeafRecipe.GetExtensions().UnsetSANExtension().UnsetAKIDExtension().SetAKIDExtension(false, rootCACert.SubjectKeyId).UnsetSKIDExtension().SetSKIDExtensionFromKey(false, leafPubKey)
+	        if sanDNSSlice != nil || sanIPSlice != nil {
+			modifiedLeafExtensions = modifiedLeafExtensions.SetSANExtension(false, sanDNSSlice, nil, sanIPSlice, nil)
+		}
+		defaultLeafRecipe.SetExtensions(modifiedLeafExtensions)
 	        defaultLeafRecipe.SignTBS(rootCAKey, defaultCertificateParams.SignatureAlgorithm)
 		certChain = CreateBadCertificateChain(certProfileDescription, nil, true, true, true, defaultLeafRecipe, badcert.CreateBadCertificateFromCertificate(rootCACert))
        } else if certRequestSigner == CERT_REQUEST_SIGNER_INTERMED1 {
 	        defaultLeafRecipe := BuildDefaultLeafRecipe().SetIssuer(&intermed1CACert.Subject).SetSubject(&pkix.Name{CommonName: subjectCN}).SetCertificatePublicKey(leafPubKey)
-		modifiedLeafExtensions := defaultLeafRecipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, []string{sanDNS}, nil, []net.IP{net.ParseIP(sanIP)}, nil).UnsetAKIDExtension().SetAKIDExtension(false, intermed1CACert.SubjectKeyId).UnsetSKIDExtension().SetSKIDExtensionFromKey(false, leafPubKey)
-	        defaultLeafRecipe.SetExtensions(modifiedLeafExtensions)	
+		modifiedLeafExtensions := defaultLeafRecipe.GetExtensions().UnsetSANExtension().UnsetAKIDExtension().SetAKIDExtension(false, intermed1CACert.SubjectKeyId).UnsetSKIDExtension().SetSKIDExtensionFromKey(false, leafPubKey)
+	        if sanDNSSlice != nil || sanIPSlice != nil {
+			modifiedLeafExtensions = modifiedLeafExtensions.SetSANExtension(false, sanDNSSlice, nil, sanIPSlice, nil)
+		}
+		defaultLeafRecipe.SetExtensions(modifiedLeafExtensions)	
 	        defaultLeafRecipe.SignTBS(intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
 		certChain = CreateBadCertificateChain(certProfileDescription, nil, true, true, true, defaultLeafRecipe, badcert.CreateBadCertificateFromCertificate(intermed1CACert), badcert.CreateBadCertificateFromCertificate(rootCACert))
        }
