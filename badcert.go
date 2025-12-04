@@ -252,6 +252,10 @@ func CreateBadCertificateFromCertificate(cert *Certificate) (*BadCertificate) {
 	return &BadCertificate{tbscert: &tbsCert, x509Certificate: cert}
 }
 
+func GetCertificateFromBadCertificate(cert *BadCertificate) (*Certificate) {
+	return(cert.x509Certificate)
+}
+
 func CreateExtensions() (ExtensionSlice) {
 	extensions := make([]pkix.Extension, 0, InitialMaxExtensions)
 	return ExtensionSlice(extensions)
