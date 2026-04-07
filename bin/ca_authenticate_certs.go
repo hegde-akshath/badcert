@@ -58,8 +58,8 @@ func CA_AUTHENTICATE_CERT_1(outputDirectory string) {
         var index int
         
 	certProfileDescription := "Certificate Version is 1"
-	badRootCARecipe      = BuildDefaultRootCARecipe().SetVersion1()
-        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetVersion1()
+	badRootCARecipe      = BuildDefaultRootCARecipe().SetVersion1().SetIsCertificateValid(false)
+        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetVersion1().SetIsCertificateValid(false)
 	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
 	for index, badCertificateChain = range *badCertificateChains {
 	        testCertData := CreateTestCertData(badCertificateChain)
@@ -79,8 +79,8 @@ func CA_AUTHENTICATE_CERT_2(outputDirectory string) {
         var index int
 
 	certProfileDescription := "Certificate Version is 2"
-	badRootCARecipe      = BuildDefaultRootCARecipe().SetVersion2()
-        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetVersion2()
+	badRootCARecipe      = BuildDefaultRootCARecipe().SetVersion2().SetIsCertificateValid(false)
+        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetVersion2().SetIsCertificateValid(false)
 	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
 	for index, badCertificateChain = range *badCertificateChains {
 		testCertData := CreateTestCertData(badCertificateChain)
@@ -101,10 +101,10 @@ func CA_AUTHENTICATE_CERT_3(outputDirectory string) {
 	var index int
 
 	certProfileDescription := "Basic Constraints Extension is absent"
-	badRootCARecipe      = BuildDefaultRootCARecipe()
+	badRootCARecipe      = BuildDefaultRootCARecipe().SetIsCertificateValid(false)
         modifiedRootCAExtensions = badRootCARecipe.GetExtensions().UnsetBasicConstraintsExtension()
 	badRootCARecipe.SetExtensions(modifiedRootCAExtensions)
-        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
+        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetIsCertificateValid(false)
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetBasicConstraintsExtension()
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
 
@@ -129,10 +129,10 @@ func CA_AUTHENTICATE_CERT_4(outputDirectory string) {
 	var index int
 
 	certProfileDescription := "Basic Constraints Extension is not marked as critical"
-	badRootCARecipe      = BuildDefaultRootCARecipe()
+	badRootCARecipe      = BuildDefaultRootCARecipe().SetIsCertificateValid(false)
         modifiedRootCAExtensions = badRootCARecipe.GetExtensions().UnsetBasicConstraintsExtension().SetBasicConstraintsExtension(false, true, 1, false)
 	badRootCARecipe.SetExtensions(modifiedRootCAExtensions)
-        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
+        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetIsCertificateValid(false)
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetBasicConstraintsExtension().SetBasicConstraintsExtension(false, true, 0, false)
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
 	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
@@ -155,10 +155,10 @@ func CA_AUTHENTICATE_CERT_5(outputDirectory string) {
 	var index int
 
 	certProfileDescription := "Basic Constraints Extension contains CA = false"
-	badRootCARecipe      = BuildDefaultRootCARecipe()
+	badRootCARecipe      = BuildDefaultRootCARecipe().SetIsCertificateValid(false)
         modifiedRootCAExtensions = badRootCARecipe.GetExtensions().UnsetBasicConstraintsExtension().SetBasicConstraintsExtension(true, false, 1, false)
 	badRootCARecipe.SetExtensions(modifiedRootCAExtensions)
-        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
+        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetIsCertificateValid(false)
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetBasicConstraintsExtension().SetBasicConstraintsExtension(true, false, 0, false)
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
 	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
@@ -182,10 +182,10 @@ func CA_AUTHENTICATE_CERT_6(outputDirectory string) {
 	var index int
 
 	certProfileDescription := "Path length constraint field is -2"
-	badRootCARecipe      = BuildDefaultRootCARecipe()
+	badRootCARecipe      = BuildDefaultRootCARecipe().SetIsCertificateValid(false)
         modifiedRootCAExtensions = badRootCARecipe.GetExtensions().UnsetBasicConstraintsExtension().SetBasicConstraintsExtension(true, true, -2, false)
 	badRootCARecipe.SetExtensions(modifiedRootCAExtensions)
-        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
+        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetIsCertificateValid(false)
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetBasicConstraintsExtension().SetBasicConstraintsExtension(true, true, -2, false)
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
 	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
@@ -209,10 +209,10 @@ func CA_AUTHENTICATE_CERT_7(outputDirectory string) {
 	var index int
 
 	certProfileDescription := "Key Usage Extension is absent"
-	badRootCARecipe      = BuildDefaultRootCARecipe()
+	badRootCARecipe      = BuildDefaultRootCARecipe().SetIsCertificateValid(false)
         modifiedRootCAExtensions = badRootCARecipe.GetExtensions().UnsetKeyUsageExtension()
 	badRootCARecipe.SetExtensions(modifiedRootCAExtensions)
-        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
+        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetIsCertificateValid(false)
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetKeyUsageExtension()
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
 	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
@@ -235,10 +235,10 @@ func CA_AUTHENTICATE_CERT_8(outputDirectory string) {
 	var index int
 
 	certProfileDescription := "Key Usage Extension doesn't contain keyCertSign bit"
-	badRootCARecipe      = BuildDefaultRootCARecipe()
+	badRootCARecipe      = BuildDefaultRootCARecipe().SetIsCertificateValid(false)
         modifiedRootCAExtensions = badRootCARecipe.GetExtensions().UnsetKeyUsageExtension().SetKeyUsageExtension(false, badcert.KeyUsageDigitalSignature|badcert.KeyUsageCRLSign)
 	badRootCARecipe.SetExtensions(modifiedRootCAExtensions)
-        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
+        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetIsCertificateValid(false)
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetKeyUsageExtension().SetKeyUsageExtension(false, badcert.KeyUsageDigitalSignature|badcert.KeyUsageCRLSign)
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
 	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
@@ -260,8 +260,8 @@ func CA_AUTHENTICATE_CERT_9(outputDirectory string) {
         var index int
 
 	certProfileDescription := "Issuer Name is Empty"
-	badRootCARecipe      = BuildDefaultRootCARecipe().SetIssuer(&pkix.Name{})
-        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetIssuer(&pkix.Name{})
+	badRootCARecipe      = BuildDefaultRootCARecipe().SetIssuer(&pkix.Name{}).SetIsCertificateValid(false)
+        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetIssuer(&pkix.Name{}).SetIsCertificateValid(false)
 	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
 	for index, badCertificateChain = range *badCertificateChains {
 		testCertData := CreateTestCertData(badCertificateChain)
@@ -280,8 +280,8 @@ func CA_AUTHENTICATE_CERT_10(outputDirectory string) {
         var index int
 
 	certProfileDescription := "Issuer Name is Empty"
-	badRootCARecipe      = BuildDefaultRootCARecipe().SetSubject(&pkix.Name{})
-        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetSubject(&pkix.Name{})
+	badRootCARecipe      = BuildDefaultRootCARecipe().SetSubject(&pkix.Name{}).SetIsCertificateValid(false)
+        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetSubject(&pkix.Name{}).SetIsCertificateValid(false)
 	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
 	for index, badCertificateChain = range *badCertificateChains {
 		testCertData := CreateTestCertData(badCertificateChain)
@@ -303,10 +303,10 @@ func CA_AUTHENTICATE_CERT_11(outputDirectory string) {
 	var index int
 
 	certProfileDescription := "SAN is present but contains no names"
-	badRootCARecipe      = BuildDefaultRootCARecipe()
+	badRootCARecipe      = BuildDefaultRootCARecipe().SetIsCertificateValid(false)
         modifiedRootCAExtensions = badRootCARecipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, nil, nil, nil, nil)
 	badRootCARecipe.SetExtensions(modifiedRootCAExtensions)
-        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
+        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetIsCertificateValid(false)
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, nil, nil, nil, nil)
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
 	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
@@ -328,8 +328,8 @@ func CA_AUTHENTICATE_CERT_12(outputDirectory string) {
         var index int
 
 	certProfileDescription := "Signature Algorithm field in certificate doesn't match with the algorithm in signed certificate"
-	badRootCARecipe      = BuildDefaultRootCARecipe().SetSignatureAlgorithmFromPrivateKey(defaultCertificateParams.RootCAKey, badcert.SHA384WithRSA)
-        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetSignatureAlgorithmFromPrivateKey(defaultCertificateParams.Intermed1CAKey, badcert.SHA384WithRSA)
+	badRootCARecipe      = BuildDefaultRootCARecipe().SetSignatureAlgorithmFromPrivateKey(defaultCertificateParams.RootCAKey, badcert.SHA384WithRSA).SetIsCertificateValid(false)
+        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetSignatureAlgorithmFromPrivateKey(defaultCertificateParams.Intermed1CAKey, badcert.SHA384WithRSA).SetIsCertificateValid(false)
 	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
 	for index, badCertificateChain = range *badCertificateChains {
 		testCertData := CreateTestCertData(badCertificateChain)
@@ -352,10 +352,10 @@ func CA_AUTHENTICATE_CERT_13(outputDirectory string) {
 	certProfileDescription := "SKID is absent"
 	badRootCARecipe      = BuildDefaultRootCARecipe()
         modifiedRootCAExtensions = badRootCARecipe.GetExtensions().UnsetSKIDExtension()
-	badRootCARecipe.SetExtensions(modifiedRootCAExtensions)
+	badRootCARecipe.SetExtensions(modifiedRootCAExtensions).SetIsCertificateValid(false)
         badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetSKIDExtension()
-	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
+	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions).SetIsCertificateValid(false)
 	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
 	for index, badCertificateChain = range *badCertificateChains {
 	        testCertData := CreateTestCertData(badCertificateChain)
@@ -376,10 +376,10 @@ func CA_AUTHENTICATE_CERT_14(outputDirectory string) {
 	var index int
 
 	certProfileDescription := "SKID is present, but marked as critical"
-	badRootCARecipe      = BuildDefaultRootCARecipe()
+	badRootCARecipe      = BuildDefaultRootCARecipe().SetIsCertificateValid(false)
         modifiedRootCAExtensions = badRootCARecipe.GetExtensions().UnsetSKIDExtension().SetSKIDExtensionFromKey(true, defaultCertificateParams.RootCAPubkey)
 	badRootCARecipe.SetExtensions(modifiedRootCAExtensions)
-        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
+        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetIsCertificateValid(false)
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetSKIDExtension().SetSKIDExtensionFromKey(true, defaultCertificateParams.Intermed1CAPubkey)
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
 	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription)
@@ -401,11 +401,11 @@ func CA_AUTHENTICATE_CERT_15(outputDirectory string) {
 	var index int
 
 	certProfileDescription := "AKID is not present"
-	goodRootCARecipe      = BuildDefaultRootCARecipe()
-        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
+	goodRootCARecipe      = BuildDefaultRootCARecipe().SetIsCertificateValid(true)
+        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetIsCertificateValid(false)
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetAKIDExtension()
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
-	goodLeafRecipe      = BuildDefaultLeafRecipe()
+	goodLeafRecipe      = BuildDefaultLeafRecipe().SetIsCertificateValid(true)
 
 	goodRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
 	badIntermed1CARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
@@ -427,11 +427,11 @@ func CA_AUTHENTICATE_CERT_16(outputDirectory string) {
 	var index int
 
 	certProfileDescription := "AKID is present, but KeyId is empty"
-	goodRootCARecipe      = BuildDefaultRootCARecipe()
-        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
+	goodRootCARecipe      = BuildDefaultRootCARecipe().SetIsCertificateValid(true)
+        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetIsCertificateValid(false)
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetAKIDExtension().SetAKIDExtensionFromKey(false, nil)
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
-	goodLeafRecipe      = BuildDefaultLeafRecipe()
+	goodLeafRecipe      = BuildDefaultLeafRecipe().SetIsCertificateValid(true)
 
 	goodRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
 	badIntermed1CARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
@@ -455,11 +455,11 @@ func CA_AUTHENTICATE_CERT_17(outputDirectory string) {
 	var index int
 
 	certProfileDescription := "AKID is present, but set to critical"
-	goodRootCARecipe      = BuildDefaultRootCARecipe()
-        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
+	goodRootCARecipe      = BuildDefaultRootCARecipe().SetIsCertificateValid(true)
+        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetIsCertificateValid(false)
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetAKIDExtension().SetAKIDExtensionFromKey(true, defaultCertificateParams.RootCAPubkey)
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
-	goodLeafRecipe      = BuildDefaultLeafRecipe()
+	goodLeafRecipe      = BuildDefaultLeafRecipe().SetIsCertificateValid(true)
 
 	goodRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
 	badIntermed1CARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
@@ -481,11 +481,11 @@ func CA_AUTHENTICATE_CERT_18(outputDirectory string) {
 	var index int
 
 	certProfileDescription := "AKID is present, but set to critical"
-	badRootCARecipe      = BuildDefaultRootCARecipe()
+	badRootCARecipe      = BuildDefaultRootCARecipe().SetIsCertificateValid(false)
 	modifiedRootCAExtensions = badRootCARecipe.GetExtensions().UnsetAKIDExtension().SetAKIDExtensionFromKey(true, defaultCertificateParams.RootCAPubkey)
 	badRootCARecipe.SetExtensions(modifiedRootCAExtensions)
-        goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
-	goodLeafRecipe      = BuildDefaultLeafRecipe()
+        goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetIsCertificateValid(true)
+	goodLeafRecipe      = BuildDefaultLeafRecipe().SetIsCertificateValid(true)
 
 	badRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
 	goodIntermed1CARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
