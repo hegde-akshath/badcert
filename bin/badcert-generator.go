@@ -13,7 +13,7 @@ var defaultCertificateParams *DefaultCertificateParams
 
 
 func main() {
-	commandType         := flag.String("command", "ca-authenticate-certs", "Command To run(ca-authenticate-certs | ssl-certs | sign-request | rfc-5280-certs | peer-name-validation-certs | get-ca-details)")
+	commandType         := flag.String("command", "ca-authenticate-certs", "Command To run(ca-authenticate-certs | ssl-certs | sign-request | peer-name-validation-certs | get-ca-details)")
 	certOutputDirectory := flag.String("cert_dir", "certs/", "Certificate output directory path")
 	certRequestType     := flag.Int("cert_request_type", int(LEAF_CERT_VERSION_1), "Type of leaf certificate to create during signing")
 	certRequestPath     := flag.String("cert_request_path", "req.pem", "Path to certificate signing request file")
@@ -30,10 +30,7 @@ func main() {
 
 	defaultCertificateParams = GenerateDefaultCertificateParams()
 	
-	if (*commandType == "rfc-5280-certs") {
-		rfc5280CertOutputDirectory := fmt.Sprintf("%s/rfc-5280-certs/", absPath)
-	        GenerateRFC5280Certs(rfc5280CertOutputDirectory)
-	} else if (*commandType == "ca-authenticate-certs") {
+	if (*commandType == "ca-authenticate-certs") {
 	        caAuthenticateCertOutputDirectory := fmt.Sprintf("%s/ca-authenticate-certs/", absPath)
 	        GenerateCAAuthenticateCerts(caAuthenticateCertOutputDirectory)
 	} else if (*commandType == "ssl-certs") {

@@ -80,6 +80,13 @@ func BuildBadCertificateChains(badRootCARecipe *badcert.BadCertificate, badInter
         badRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
         badIntermed1CARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
 	badLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
+
+	goodRootCARecipe.SetIsCertificateValid(true).SetIdentityString()
+	goodIntermed1CARecipe.SetIsCertificateValid(true).SetIdentityString()
+	goodLeafRecipe.SetIsCertificateValid(true).SetIdentityString()
+	badRootCARecipe.SetIsCertificateValid(false).SetIdentityString()
+	badIntermed1CARecipe.SetIsCertificateValid(false).SetIdentityString()
+	badLeafRecipe.SetIsCertificateValid(false).SetIdentityString()
         
 	//NOTE: The combination with all good certificates won't be generated here, as it will be repetitive regardless of how the function is called
 	
@@ -124,7 +131,7 @@ func BuildBadCertificateChains(badRootCARecipe *badcert.BadCertificate, badInter
 //So it can't be sued in cases where the bad certificate is created due to modification related to key or signature params
 //Or a chain with a different setup
 //In such cases, use the underlying cert generation functions directly
-func BuildBadCACertificateChains(badRootCARecipe *badcert.BadCertificate, badIntermed1CARecipe *badcert.BadCertificate, certProfileBaseDescription string) (*BadCertificateChains) {
+func BuildBadCACertificateChains(badRootCARecipe *badcert.BadCertificate, badIntermed1CARecipe *badcert.BadCertificate, certProfileBaseDescription string, badRootCAExpectedLogs []string, badIntermed1CAExpectedLogs []string) (*BadCertificateChains) {
 	goodRootCARecipe      := BuildDefaultRootCARecipe()
         goodIntermed1CARecipe := BuildDefaultIntermed1CARecipe()
         goodLeafRecipe        := BuildDefaultLeafRecipe()
@@ -134,6 +141,12 @@ func BuildBadCACertificateChains(badRootCARecipe *badcert.BadCertificate, badInt
 	goodLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
         badRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
         badIntermed1CARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
+        
+	goodRootCARecipe.SetIsCertificateValid(true).SetIdentityString()
+	goodIntermed1CARecipe.SetIsCertificateValid(true).SetIdentityString()
+	goodLeafRecipe.SetIsCertificateValid(true).SetIdentityString()
+	badRootCARecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(badRootCAExpectedLogs)
+	badIntermed1CARecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(badIntermed1CAExpectedLogs)
         
 	//NOTE: The combination with all good certificates won't be generated here, as it will be repetitive regardless of how the function is called
 
