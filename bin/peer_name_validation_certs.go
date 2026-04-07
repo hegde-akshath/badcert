@@ -35,8 +35,8 @@ func PEER_NAME_VALIDATION_CERT(caDirectory string, outputDirectory string, leafP
         rootCAKey, intermed1CAKey   := loadDefaultCAKeys(caDirectory)
         rootCACert, intermed1CACert := loadDefaultCACerts(caDirectory)
 
-	goodRootCACert      = badcert.CreateBadCertificateFromCertificate(rootCACert).SetIsCertificateValid(true)
-	goodIntermed1CACert = badcert.CreateBadCertificateFromCertificate(intermed1CACert).SetIsCertificateValid(true)
+	goodRootCACert      = badcert.CreateBadCertificateFromCertificate(rootCACert).SetIsCertificateValid(true).SetIdentityString()
+	goodIntermed1CACert = badcert.CreateBadCertificateFromCertificate(intermed1CACert).SetIsCertificateValid(true).SetIdentityString()
 
 	certProfileDescription := "Peer Name Validation"
         
@@ -62,6 +62,7 @@ func PEER_NAME_VALIDATION_CERT(caDirectory string, outputDirectory string, leafP
 		}
 		defaultLeafRecipe.SetExtensions(modifiedLeafExtensions)
 	        defaultLeafRecipe.SignTBS(rootCAKey, defaultCertificateParams.SignatureAlgorithm)
+		defaultLeafRecipe.SetIdentityString()
 		certChain = CreateBadCertificateChain(certProfileDescription, nil, true, true, true, defaultLeafRecipe, goodRootCACert)
        } else if certRequestSigner == CERT_REQUEST_SIGNER_INTERMED1 {
 	        defaultLeafRecipe := BuildDefaultLeafRecipe().SetIssuer(&intermed1CACert.Subject).SetSubject(&pkix.Name{CommonName: subjectCN}).SetCertificatePublicKey(leafPubKey).SetIsCertificateValid(true)
@@ -69,8 +70,9 @@ func PEER_NAME_VALIDATION_CERT(caDirectory string, outputDirectory string, leafP
 	        if sanDNSSlice != nil || sanIPSlice != nil {
 			modifiedLeafExtensions = modifiedLeafExtensions.SetSANExtension(false, sanDNSSlice, nil, sanIPSlice, nil)
 		}
-		defaultLeafRecipe.SetExtensions(modifiedLeafExtensions)	
+		defaultLeafRecipe.SetExtensions(modifiedLeafExtensions)
 	        defaultLeafRecipe.SignTBS(intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
+		defaultLeafRecipe.SetIdentityString()
 		certChain = CreateBadCertificateChain(certProfileDescription, nil, true, true, true, defaultLeafRecipe, goodIntermed1CACert, goodRootCACert)
        }
 

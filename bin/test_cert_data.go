@@ -19,6 +19,7 @@ type TestCertData struct {
 	IntermedCACertChainPem string
 	LeafCertPem string
 	LeafPrivateKey string
+	ExpectedLogs []string
 } 
 
 func CreateTestCertData(badCertChain BadCertificateChain) (*TestCertData) {
@@ -70,7 +71,7 @@ func CreateTestCertData(badCertChain BadCertificateChain) (*TestCertData) {
 	testCertData.IsIntermedCACertChainValid = badCertChain.IsIntermedCACertChainValid
 	testCertData.IsLeafCertValid            = badCertChain.IsLeafCertValid 
 	testCertData.CertProfileDescription     = badCertChain.CertProfileDescription 
-
+        testCertData.ExpectedLogs               = badCertChain.ExpectedLogs
 	return &testCertData	    
 }
 

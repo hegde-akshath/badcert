@@ -14,6 +14,7 @@ type BadCertificateChain struct {
 	IsIntermedCACertChainValid bool
 	IsLeafCertValid bool
 	Chain []*badcert.BadCertificate
+	ExpectedLogs []string
 }
 
 type BadCertificateChains []BadCertificateChain
@@ -42,6 +43,7 @@ func CreateBadCertificateChain(certProfileDescription string, leafPrivateKey cry
         
 	for _, cert := range certs {
 		badCertChain.Chain = append(badCertChain.Chain, cert)
+		badCertChain.ExpectedLogs = append(badCertChain.ExpectedLogs, cert.GetExpectedLogs()...)
 	}
 	badCertChain.CertProfileDescription     = GenerateCertificateProfileDescription(certProfileDescription, isRootCACertValid, isIntermedCACertChainValid, isLeafCertValid)
 	badCertChain.LeafPrivateKey             = leafPrivateKey
