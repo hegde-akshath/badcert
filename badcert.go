@@ -87,6 +87,9 @@ type BadCertValidity struct {
 type BadCertificate struct {	
 	tbscert *tbsCertificate
         x509Certificate *Certificate
+	isCertValid bool
+	certDescription string
+        expectedLogs []string
 
 	//Right now, this field is being derived while setting public key and storing it to avoid recalculating
 	//But this should not be present here and should be done in a different way
@@ -673,6 +676,21 @@ func (badcert *BadCertificate) SetCertificatePublicKeyFromPrivateKey(privKey cry
 	return badcert
 }
 
+func (badcert *BadCertificate) SetIsCertificateValid(valid bool) (*BadCertificate) {
+        badcert.isCertValid = valid
+	return badcert
+}
+
+func (badcert *BadCertificate) SetCertificateDescription(description string) (*BadCertificate) {
+        badcert.certDescription = description
+	return badcert
+}
+
+func (badcert *BadCertificate) SetExpectedLogs(expectedLogs []string) (*BadCertificate) {
+        badcert.expectedLogs = expectedLogs
+	return badcert
+}
+
 func (badcert *BadCertificate) SignTBS(privKey crypto.PrivateKey, signatureAlgorithm SignatureAlgorithm) (*BadCertificate) { 
 	signer, _ := GetSignerFromKey(privKey)
 
@@ -708,6 +726,7 @@ func (badcert *BadCertificate) SignTBS(privKey crypto.PrivateKey, signatureAlgor
 
 	return badcert
 }
+
 
 //NOTE: This doesn't verify exactly what we want. In our case, we have created a chain and we are aware of the exact path from leaf to root
 //We need to make sure that signatures are valid and the chain has been built succesfully.
