@@ -48,9 +48,11 @@ const (
 	LEAF_CERT_AKID_NO_KEYID
 	LEAF_CERT_AKID_CRITICAL
 	LEAF_CERT_SKID_CRITICAL
+    LEAF_CERT_BASIC_CONSTRAINTS_ABSENT
+	LEAF_CERT_KEYUSAGE_ABSENT
 )
 
-
+		
 func loadDefaultCAKeys(caDirectoryPath string) (crypto.PrivateKey, crypto.PrivateKey) {
 	rootCAKey      := LoadKey(fmt.Sprintf("%s/root-ca-key.pem", caDirectoryPath))
 	intermed1CAKey := LoadKey(fmt.Sprintf("%s/intermed1-ca-key.pem", caDirectoryPath))
@@ -635,7 +637,87 @@ func SignRequestBadCertLeafSKIDCritical(signRequestCertOutputDirectory string, c
        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/LEAF-CERT-SKID-CRITICAL-%s.json", signRequestCertOutputDirectory, signerDesc))
 }
 
+func SignRequestBadCertLeafBasicConstraintsAbsent(signRequestCertOutputDirectory string, certRequestPath string, certRequestSigner CertRequestSigner, rootCAKey crypto.PrivateKey, intermed1CAKey crypto.PrivateKey, rootCACert *badcert.Certificate, intermed1CACert *badcert.Certificate) {
+       var certRequest *badcert.CertificateRequest
+       var certRequestFields *CertificateRequestFields
+       var certChain BadCertificateChain
+       var signerDesc string
+       var goodRootCACert *badcert.BadCertificate
+       var goodIntermed1CACert *badcert.BadCertificate
 
+       certRequest = LoadCertificateRequest(certRequestPath)
+       certRequestFields = ExtractCertRequestFields(certRequest)
+
+       certProfileDescription := "Leaf Cert has no  Basic Constraints extension"
+       
+       goodRootCACert = badcert.CreateBadCertificateFromCertificate(rootCACert).SetIsCertificateValid(true)
+       goodIntermed1CACert = badcert.CreateBadCertificateFromCertificate(intermed1CACert).SetIsCertificateValid(true)
+ 
+       if certRequestSigner == CERT_REQUEST_SIGNER_ROOT {
+	       signerDesc = "ROOT"
+               badLeafRecipe := BuildLeafCertFromCertRequest(certRequestFields, &rootCACert.Subject, rootCACert.SubjectKeyId).SetIsCertificateValid(false)
+	       modifiedLeafExtensions := badLeafRecipe.GetExtensions().UnsetBasicConstraintsExtension()
+	       badLeafRecipe.SetExtensions(modifiedLeafExtensions)
+	       badLeafRecipe.SignTBS(rootCAKey, defaultCertificateParams.SignatureAlgorithm)
+               certChain = CreateBadCertificateChain(certProfileDescription, nil, true, true, false, badLeafRecipe, goodRootCACert) 
+       } else if certRequestSigner == CERT_REQUEST_SIGNER_INTERMED1 {
+	       signerDesc = "INTERMED1"
+               badLeafRecipe := BuildLeafCertFromCertRequest(certRequestFields, &intermed1CACert.Subject, intermed1CACert.SubjectKeyId).SetIsCertificateValid(false)
+	       modifiedLeafExtensions := badLeafRecipe.GetExtensions().UnsetBasicConstraintsExtension()
+	       badLeafRecipe.SetExtensions(modifiedLeafExtensions)
+	       badLeafRecipe.SignTBS(intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
+               certChain = CreateBadCertificateChain(certProfileDescription, nil, true, true, false, badLeafRecipe, goodIntermed1CACert, goodRootCACert) 
+       }
+
+       testCertData := CreateTestCertData(certChain)
+       testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/LEAF-CERT-BASIC-CONSTRAINTS-ABSENT-%s.json", signRequestCertOutputDirectory, signerDesc))
+}
+
+
+func SignRequestBadCertLeafKeyusageAbsent(signRequestCertOutputDirectory string, certRequestPath string, certRequestSigner CertRequestSigner, rootCAKey crypto.PrivateKey, intermed1CAKey crypto.PrivateKey, rootCACert *badcert.Certificate, intermed1CACert *badcert.Certificate) {
+       var certRequest *badcert.CertificateRequest
+       var certRequestFields *CertificateRequestFields
+       var certChain BadCertificateChain
+       var signerDesc string
+       var goodRootCACert *badcert.BadCertificate
+       var goodIntermed1CACert *badcert.BadCertificate
+
+       certRequest = LoadCertificateRequest(certRequestPath)
+       certRequestFields = ExtractCertRequestFields(certRequest)
+         
+       certProfileDescription := "Leaf Cert contains no Key Usage extension"
+       
+       goodRootCACert = badcert.CreateBadCertificateFromCertificate(rootCACert).SetIsCertificateValid(true)
+       goodIntermed1CACert = badcert.CreateBadCertificateFromCertificate(intermed1CACert).SetIsCertificateValid(true)
+ 
+       if certRequestSigner == CERT_REQUEST_SIGNER_ROOT {
+	       signerDesc = "ROOT"
+               badLeafRecipe := BuildLeafCertFromCertRequest(certRequestFields, &rootCACert.Subject, rootCACert.SubjectKeyId).SetIsCertificateValid(false)
+	       modifiedLeafExtensions := badLeafRecipe.GetExtensions()
+               if certRequestFields.KeyUsage != nil {
+		       modifiedLeafExtensions = modifiedLeafExtensions.UnsetKeyUsageExtension()
+               }
+	       badLeafRecipe.SetExtensions(modifiedLeafExtensions)
+	       badLeafRecipe.SignTBS(rootCAKey, defaultCertificateParams.SignatureAlgorithm)
+               certChain = CreateBadCertificateChain(certProfileDescription, nil, true, true, false, badLeafRecipe, goodRootCACert) 
+       } else if certRequestSigner == CERT_REQUEST_SIGNER_INTERMED1 {
+	       signerDesc = "INTERMED1"
+               badLeafRecipe := BuildLeafCertFromCertRequest(certRequestFields, &intermed1CACert.Subject, intermed1CACert.SubjectKeyId).SetIsCertificateValid(false)
+	       modifiedLeafExtensions := badLeafRecipe.GetExtensions()
+	       if certRequestFields.KeyUsage != nil {
+		       modifiedLeafExtensions = modifiedLeafExtensions.UnsetKeyUsageExtension()
+               }
+	       badLeafRecipe.SetExtensions(modifiedLeafExtensions)
+	       badLeafRecipe.SignTBS(intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
+               certChain = CreateBadCertificateChain(certProfileDescription, nil, true, true, false, badLeafRecipe, goodIntermed1CACert, goodRootCACert)  
+       }
+
+       testCertData := CreateTestCertData(certChain)
+       testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/LEAF-CERT-KEYUSAGE-ABSENT-%s.json", signRequestCertOutputDirectory, signerDesc))
+
+}
+
+	
 
 func SignRequest(caDirectory string, signRequestCertOutputDirectory string, certRequestType CertRequestType, certRequestPath string, certRequestSigner CertRequestSigner) {
 	CreateDirectory(signRequestCertOutputDirectory)
@@ -689,7 +771,13 @@ func SignRequest(caDirectory string, signRequestCertOutputDirectory string, cert
 	} else if (certRequestType == LEAF_CERT_SKID_CRITICAL) {
 		fmt.Println("Generating Leaf Certificate with SKID extension marked critical")
 		SignRequestBadCertLeafSKIDCritical(signRequestCertOutputDirectory, certRequestPath, certRequestSigner, rootCAKey, intermed1CAKey, rootCACert, intermed1CACert)
-	}  else {
+	}  else if (certRequestType == LEAF_CERT_BASIC_CONSTRAINTS_ABSENT) {
+		fmt.Println("Generating Leaf Certificate with BasicConstraints extension absent")
+		SignRequestBadCertLeafBasicConstraintsAbsent(signRequestCertOutputDirectory, certRequestPath, certRequestSigner, rootCAKey, intermed1CAKey, rootCACert, intermed1CACert)
+	} else if (certRequestType == LEAF_CERT_KEYUSAGE_ABSENT) {
+		fmt.Println("Generating Leaf Certificate with KeyUsage absent")
+		SignRequestBadCertLeafKeyusageAbsent(signRequestCertOutputDirectory, certRequestPath, certRequestSigner, rootCAKey, intermed1CAKey, rootCACert, intermed1CACert)
+	} else {
 		panic(errors.New("Unknown sign request type"))
 	}
 }

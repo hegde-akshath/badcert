@@ -209,7 +209,7 @@ func NewMarshalAKID(critical bool, authorityKeyId []byte) (pkix.Extension, error
 	        Id: oidExtensionAuthorityKeyId,
 		Critical: critical,
 	       } 
-
+    
 	ext.Value, err = asn1.Marshal(authKeyId{authorityKeyId})
 	return ext, err
 }
@@ -460,7 +460,13 @@ func (extensions ExtensionSlice) SetAKIDExtension(critical bool, authorityKeyId 
 }
 
 func (extensions ExtensionSlice) SetAKIDExtensionFromKey(critical bool, pubKey crypto.PublicKey)(ExtensionSlice) {
-	authorityKeyId := GenerateKeyIdFromKey(pubKey)
+	var authorityKeyId []byte
+
+	if pubKey == nil {
+		authorityKeyId = []byte{}
+	} else {
+	    authorityKeyId = GenerateKeyIdFromKey(pubKey)
+	}
 	return(extensions.SetAKIDExtension(critical, authorityKeyId))
 }
 
@@ -490,7 +496,14 @@ func (extensions ExtensionSlice) SetSKIDExtension(critical bool, subjectKeyId []
 }
 
 func (extensions ExtensionSlice) SetSKIDExtensionFromKey(critical bool, pubKey crypto.PublicKey)(ExtensionSlice) {
-	subjectKeyId := GenerateKeyIdFromKey(pubKey)
+	var subjectKeyId []byte
+
+	if pubKey == nil {
+		subjectKeyId = []byte{}
+	} else {
+	    subjectKeyId = GenerateKeyIdFromKey(pubKey)
+	}
+	
 	return(extensions.SetSKIDExtension(critical, subjectKeyId))
 }
 

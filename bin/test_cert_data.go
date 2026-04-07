@@ -77,18 +77,28 @@ func CreateTestCertData(badCertChain BadCertificateChain) (*TestCertData) {
 func (testCertData *TestCertData) WriteTestCertDataJson(filepath string) {
 	var err error
 	var jsonData []byte
-        var f *os.File
+    var f *os.File
 
 	jsonData, err = json.Marshal(*testCertData)
 	if err != nil {
 		panic(err)
 	}
 
-        f, err = os.Create(filepath)
+    f, err = os.Create(filepath)
 	if err != nil {
 		panic(err)
 	}
-        defer f.Close()
-        f.Write(jsonData)
+    defer f.Close()
+    f.Write(jsonData)
+
+	fullChain := testCertData.LeafCertPem + testCertData.IntermedCACertChainPem + testCertData.RootCACertPem 
+	chainFilePath := filepath + ".chain.pem"
+
+    f, err = os.Create(chainFilePath)
+	if err != nil {
+		panic(err)
+	}
+    defer f.Close()
+    f.Write([]byte(fullChain))
 }
 

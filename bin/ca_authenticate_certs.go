@@ -46,6 +46,27 @@ Requirements for a Good Self Signed CA Certificates
 16)SKID extension must be present, and must not be set to critical
 */
 
+/*
+Test Description: Completely good certificate chain
+Applicable To: Self Signed Root CA, Intermediate CA
+*/
+func CA_AUTHENTICATE_CERT_GOOD(outputDirectory string) {
+    var goodRootCARecipe *badcert.BadCertificate
+	var goodIntermed1CARecipe *badcert.BadCertificate
+	var goodCertificateChain BadCertificateChain
+    var index int
+        
+	certProfileDescription := "Good Certificate Chain"
+	goodRootCARecipe      = BuildDefaultRootCARecipe().SetIsCertificateValid(true)
+        goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetIsCertificateValid(true)
+	goodCertificateChains := BuildBadCACertificateChains(goodRootCARecipe, goodIntermed1CARecipe, certProfileDescription)
+	for index, goodCertificateChain = range *goodCertificateChains {
+	    testCertData := CreateTestCertData(goodCertificateChain)
+            testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CA-AUTH-CERT-GOOD-CAT1-%d.json", outputDirectory, index))
+	}
+}
+
+
 
 /*
 Test Description: Certificate Version is not correct(version 1), but all other fields are as expected
@@ -418,7 +439,7 @@ func CA_AUTHENTICATE_CERT_15(outputDirectory string) {
 /*
 Test Description: AKID is present, but KeyId is empty
 Applicable To: Intermediate CA
-
+*/
 func CA_AUTHENTICATE_CERT_16(outputDirectory string) {
         var goodRootCARecipe *badcert.BadCertificate
 	var badIntermed1CARecipe *badcert.BadCertificate
@@ -440,7 +461,6 @@ func CA_AUTHENTICATE_CERT_16(outputDirectory string) {
 	testCertData := CreateTestCertData(certChain)
         testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CA-AUTH-CERT-16-CAT1-%d.json", outputDirectory, index))	
 }
-*/
 
 
 /*
@@ -495,11 +515,119 @@ func CA_AUTHENTICATE_CERT_18(outputDirectory string) {
         testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CA-AUTH-CERT-18-CAT1-%d.json", outputDirectory, index))	
 }
 
+/*
+Test Description: AKID is present, but KeyId is empty
+Applicable To: Root CA
+*/
+func CA_AUTHENTICATE_CERT_21(outputDirectory string) {
+    var badRootCARecipe *badcert.BadCertificate
+	var modifiedRootCAExtensions badcert.ExtensionSlice
+	var goodIntermed1CARecipe *badcert.BadCertificate
+	var goodLeafRecipe *badcert.BadCertificate
+	var index int
+
+	certProfileDescription := "AKID is present, but KeyId is empty"
+	badRootCARecipe      = BuildDefaultRootCARecipe().SetIsCertificateValid(false)
+	modifiedRootCAExtensions = badRootCARecipe.GetExtensions().UnsetAKIDExtension().SetAKIDExtensionFromKey(false, nil)
+	badRootCARecipe.SetExtensions(modifiedRootCAExtensions)
+	goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetIsCertificateValid(true)
+	goodLeafRecipe      = BuildDefaultLeafRecipe().SetIsCertificateValid(true)
+
+	badRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
+	goodIntermed1CARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
+	goodLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
+        certChain := CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, false, true, true, goodLeafRecipe,goodIntermed1CARecipe,badRootCARecipe)
+	testCertData := CreateTestCertData(certChain)
+        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CA-AUTH-CERT-21-CAT1-%d.json", outputDirectory, index))	
+}
+
+
+/*
+Test Description: SKID is present, but KeyId is empty
+Applicable To: Root CA
+*/
+func CA_AUTHENTICATE_CERT_22(outputDirectory string) {
+    var badRootCARecipe *badcert.BadCertificate
+	var modifiedRootCAExtensions badcert.ExtensionSlice
+	var goodIntermed1CARecipe *badcert.BadCertificate
+	var goodLeafRecipe *badcert.BadCertificate
+	var index int
+
+	certProfileDescription := "SKID is present, but KeyId is empty"
+	badRootCARecipe      = BuildDefaultRootCARecipe().SetIsCertificateValid(false)
+	modifiedRootCAExtensions = badRootCARecipe.GetExtensions().UnsetSKIDExtension().SetSKIDExtensionFromKey(false, nil)
+	badRootCARecipe.SetExtensions(modifiedRootCAExtensions)
+	goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetIsCertificateValid(true)
+	goodLeafRecipe      = BuildDefaultLeafRecipe().SetIsCertificateValid(true)
+
+	badRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
+	goodIntermed1CARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
+	goodLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
+        certChain := CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, false, true, true, goodLeafRecipe,goodIntermed1CARecipe,badRootCARecipe)
+	testCertData := CreateTestCertData(certChain)
+        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CA-AUTH-CERT-22-CAT1-%d.json", outputDirectory, index))	
+}
+
+
+/*
+Test Description: SAN is absent
+Applicable To: Root CA
+*/
+func CA_AUTHENTICATE_CERT_23(outputDirectory string) {
+        var badRootCARecipe *badcert.BadCertificate
+	var modifiedRootCAExtensions badcert.ExtensionSlice
+	var goodIntermed1CARecipe *badcert.BadCertificate
+	var goodLeafRecipe *badcert.BadCertificate
+	var index int
+
+	certProfileDescription := "SAN is absent"
+	badRootCARecipe      = BuildDefaultRootCARecipe().SetIsCertificateValid(false)
+	modifiedRootCAExtensions = badRootCARecipe.GetExtensions().UnsetSANExtension()
+	badRootCARecipe.SetExtensions(modifiedRootCAExtensions)
+        goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetIsCertificateValid(true)
+	goodLeafRecipe      = BuildDefaultLeafRecipe().SetIsCertificateValid(true)
+
+	badRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
+	goodIntermed1CARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
+	goodLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
+        certChain := CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, false, true, true, goodLeafRecipe,goodIntermed1CARecipe,badRootCARecipe)
+	testCertData := CreateTestCertData(certChain)
+        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CA-AUTH-CERT-23-CAT1-%d.json", outputDirectory, index))	
+}
+
+
+/*
+Test Description: SAN is absent
+Applicable To: Intermediate CA
+*/
+func CA_AUTHENTICATE_CERT_24(outputDirectory string) {
+        var goodRootCARecipe *badcert.BadCertificate
+	var badIntermed1CARecipe *badcert.BadCertificate
+	var modifiedIntermed1CAExtensions badcert.ExtensionSlice
+	var goodLeafRecipe *badcert.BadCertificate
+	var index int
+
+	certProfileDescription := "SAN is not present"
+	goodRootCARecipe      = BuildDefaultRootCARecipe().SetIsCertificateValid(true)
+        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe().SetIsCertificateValid(false)
+	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetSANExtension()
+	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
+	goodLeafRecipe      = BuildDefaultLeafRecipe().SetIsCertificateValid(true)
+
+	goodRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
+	badIntermed1CARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
+	goodLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
+        certChain := CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, true, false, true, goodLeafRecipe,badIntermed1CARecipe,goodRootCARecipe)
+	testCertData := CreateTestCertData(certChain)
+        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CA-AUTH-CERT-24-CAT1-%d.json", outputDirectory, index))	
+}
+
 
 
 
 func GenerateCAAuthenticateCerts(caAuthenticateCertOutputDirectory string) {
 	CreateDirectory(caAuthenticateCertOutputDirectory)
+	CA_AUTHENTICATE_CERT_GOOD(caAuthenticateCertOutputDirectory)
 	CA_AUTHENTICATE_CERT_1(caAuthenticateCertOutputDirectory)
 	CA_AUTHENTICATE_CERT_2(caAuthenticateCertOutputDirectory)
 	CA_AUTHENTICATE_CERT_3(caAuthenticateCertOutputDirectory)
@@ -515,7 +643,11 @@ func GenerateCAAuthenticateCerts(caAuthenticateCertOutputDirectory string) {
 	CA_AUTHENTICATE_CERT_13(caAuthenticateCertOutputDirectory)
 	CA_AUTHENTICATE_CERT_14(caAuthenticateCertOutputDirectory)
 	CA_AUTHENTICATE_CERT_15(caAuthenticateCertOutputDirectory)
-	//CA_AUTHENTICATE_CERT_16(caAuthenticateCertOutputDirectory)
+	CA_AUTHENTICATE_CERT_16(caAuthenticateCertOutputDirectory)
 	CA_AUTHENTICATE_CERT_17(caAuthenticateCertOutputDirectory)
 	CA_AUTHENTICATE_CERT_18(caAuthenticateCertOutputDirectory)
+	CA_AUTHENTICATE_CERT_21(caAuthenticateCertOutputDirectory)
+	CA_AUTHENTICATE_CERT_22(caAuthenticateCertOutputDirectory)
+	CA_AUTHENTICATE_CERT_23(caAuthenticateCertOutputDirectory)
+	CA_AUTHENTICATE_CERT_24(caAuthenticateCertOutputDirectory)
 }
