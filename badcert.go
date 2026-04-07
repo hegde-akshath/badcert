@@ -753,7 +753,7 @@ func (badcert *BadCertificate) SetIdentityString() (*BadCertificate) {
 	}
 
 	// Format into the requested string structure
-	badcert.identityString = fmt.Sprintf(" Serial Number: %s, Subject: %s and Issuer: %s", serialString, subject, issuer)
+	badcert.identityString = fmt.Sprintf("Serial Number: %s, Subject: %s and Issuer: %s", serialString, subject, issuer)
 	return badcert
 }
 
