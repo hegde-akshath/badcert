@@ -89,6 +89,7 @@ type BadCertificate struct {
         x509Certificate *Certificate
 	isCertValid bool
 	certDescription string
+	identityString string
         expectedLogs []string
 
 	//Right now, this field is being derived while setting public key and storing it to avoid recalculating
@@ -694,13 +695,54 @@ func (badcert *BadCertificate) SetIsCertificateValid(valid bool) (*BadCertificat
 	return badcert
 }
 
+func (badcert *BadCertificate) GetIsCertificateValid() (bool) {
+	return badcert.isCertValid
+}
+
 func (badcert *BadCertificate) SetCertificateDescription(description string) (*BadCertificate) {
         badcert.certDescription = description
 	return badcert
 }
 
+func (badcert *BadCertificate) GetCertificateDescription() (string) {
+	return badcert.certDescription
+}
+
 func (badcert *BadCertificate) SetExpectedLogs(expectedLogs []string) (*BadCertificate) {
         badcert.expectedLogs = expectedLogs
+	return badcert
+}
+
+func (badcert *BadCertificate) GetExpectedLogs() ([]string) {
+	return badcert.expectedLogs
+}
+
+func (badcert *BadCertificate) SetIdentityString() (*BadCertificate) {
+	var serialString string
+	var serialInt *big.Int
+
+	subject := badcert.x509Certificate.Subject.String()
+	if subject == "" {
+		subject = "EMPTY"
+	}
+
+	issuer := badcert.x509Certificate.Issuer.String()
+	if issuer == "" {
+		issuer = "EMPTY"
+	}
+
+	serialInt = badcert.x509Certificate.SerialNumber
+	if serialInt == nil {
+		serialString = "EMPTY"
+	} else {
+		serialString = serialInt.String()
+		if serialString == "" {
+			serialString = "EMPTY"
+		}
+	}
+
+	// Format into the requested string structure
+	badcert.identityString = fmt.Sprintf(" Serial Number: %s, Subject: %s and Issuer: %s.", serialString, subject, issuer)
 	return badcert
 }
 
