@@ -709,7 +709,18 @@ func (badcert *BadCertificate) GetCertificateDescription() (string) {
 }
 
 func (badcert *BadCertificate) SetExpectedLogs(expectedLogs []string) (*BadCertificate) {
-        badcert.expectedLogs = expectedLogs
+	var identityString string
+	var expectedLog string
+
+	identityString = badcert.GetIdentityString()
+	if identityString == "" {
+		panic(fmt.Errorf("Identity String not set"))
+	}
+        
+	for _, log := range expectedLogs {
+		expectedLog = fmt.Sprintf("%s. Error: %s", identityString, log) 
+	        badcert.expectedLogs = append(badcert.expectedLogs, expectedLog)
+	}
 	return badcert
 }
 
@@ -742,8 +753,12 @@ func (badcert *BadCertificate) SetIdentityString() (*BadCertificate) {
 	}
 
 	// Format into the requested string structure
-	badcert.identityString = fmt.Sprintf(" Serial Number: %s, Subject: %s and Issuer: %s.", serialString, subject, issuer)
+	badcert.identityString = fmt.Sprintf(" Serial Number: %s, Subject: %s and Issuer: %s", serialString, subject, issuer)
 	return badcert
+}
+
+func (badcert *BadCertificate) GetIdentityString() (string) {
+	return badcert.identityString
 }
 
 func (badcert *BadCertificate) SignTBS(privKey crypto.PrivateKey, signatureAlgorithm SignatureAlgorithm) (*BadCertificate) { 
