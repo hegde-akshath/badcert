@@ -45,7 +45,7 @@ Requirements for a Good Leaf Certificates
 Test Description: Intermedicate CA version is 1
 Applicable To: Intermediate CA
 */
-func SSL_CERT_1(outputDirectory string) {
+func SSL_CERT_01(outputDirectory string) {
         var goodRootCARecipe *badcert.BadCertificate
 	var badIntermed1CARecipe *badcert.BadCertificate
 	var goodLeafRecipe *badcert.BadCertificate
@@ -55,30 +55,31 @@ func SSL_CERT_1(outputDirectory string) {
 	expectedLogs = append(expectedLogs, "X509 certificate version is not 3")
 
 	certProfileDescription := "Intermedicate CA version is 1"
+	
 	goodRootCARecipe      = BuildDefaultRootCARecipe()
-        badIntermed1CARecipe  = BuildDefaultIntermed1CARecipe().SetVersion1()
+    badIntermed1CARecipe  = BuildDefaultIntermed1CARecipe().SetVersion1()
 	goodLeafRecipe        = BuildDefaultLeafRecipe()
 
 	goodRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
-        goodRootCARecipe.SetIsCertificateValid(true).SetIdentityString()	
+    goodRootCARecipe.SetIsCertificateValid(true).SetIdentityString()	
 
 	badIntermed1CARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
 	badIntermed1CARecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(expectedLogs)
 
 	goodLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-        goodLeafRecipe.SetIsCertificateValid(true).SetIdentityString()
+    goodLeafRecipe.SetIsCertificateValid(true).SetIdentityString()
 
-        certChain := CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, true, false, true, goodLeafRecipe,badIntermed1CARecipe,goodRootCARecipe)
+    certChain := CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, true, false, true, goodLeafRecipe,badIntermed1CARecipe,goodRootCARecipe)
 	testCertData := CreateTestCertData(certChain)
-        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-CERT-1-CAT1-%d.json", outputDirectory, index))	
+    testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-CERT-01-CAT1-%d.json", outputDirectory, index))	
 }
 
 /*
 Test Description: Intermedicate CA version is 2
 Applicable To: Intermediate CA
 */
-func SSL_CERT_2(outputDirectory string) {
-        var goodRootCARecipe *badcert.BadCertificate
+func SSL_CERT_02(outputDirectory string) {
+    var goodRootCARecipe *badcert.BadCertificate
 	var badIntermed1CARecipe *badcert.BadCertificate
 	var goodLeafRecipe *badcert.BadCertificate
 	var index int
@@ -87,8 +88,9 @@ func SSL_CERT_2(outputDirectory string) {
 	expectedLogs = append(expectedLogs, "X509 certificate version is not 3")
 
 	certProfileDescription := "Intermedicate CA version is 2"
+	
 	goodRootCARecipe      = BuildDefaultRootCARecipe()
-        badIntermed1CARecipe  = BuildDefaultIntermed1CARecipe().SetVersion2()
+    badIntermed1CARecipe  = BuildDefaultIntermed1CARecipe().SetVersion2()
 	goodLeafRecipe        = BuildDefaultLeafRecipe()
 
 	goodRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
@@ -98,19 +100,19 @@ func SSL_CERT_2(outputDirectory string) {
 	badIntermed1CARecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(expectedLogs)
 
 	goodLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-        goodLeafRecipe.SetIsCertificateValid(true).SetIdentityString()
+    goodLeafRecipe.SetIsCertificateValid(true).SetIdentityString()
 
 	certChain := CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, true, false, true, goodLeafRecipe,badIntermed1CARecipe,goodRootCARecipe)
 	testCertData := CreateTestCertData(certChain)
-        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-CERT-2-CAT1-%d.json", outputDirectory, index))	
+    testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-CERT-02-CAT1-%d.json", outputDirectory, index))	
 }
 
 /*
 Test Description: Basic Constraints is absent in Intermediate CA
 Applicable To: Intermediate CA
 */
-func SSL_CERT_3(outputDirectory string) {
-        var goodRootCARecipe *badcert.BadCertificate
+func SSL_CERT_03(outputDirectory string) {
+    var goodRootCARecipe *badcert.BadCertificate
 	var badIntermed1CARecipe *badcert.BadCertificate
 	var modifiedIntermed1CAExtensions badcert.ExtensionSlice
 	var goodLeafRecipe *badcert.BadCertificate
@@ -120,8 +122,9 @@ func SSL_CERT_3(outputDirectory string) {
 	expectedLogs = append(expectedLogs, "Basic Constraints extension not found in certificate")
 
 	certProfileDescription := "Basic Constraints is absent in Intermediate CA"
+	
 	goodRootCARecipe      = BuildDefaultRootCARecipe()
-        badIntermed1CARecipe  = BuildDefaultIntermed1CARecipe()
+    badIntermed1CARecipe  = BuildDefaultIntermed1CARecipe()
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetBasicConstraintsExtension()
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
 	goodLeafRecipe        = BuildDefaultLeafRecipe()
@@ -133,19 +136,19 @@ func SSL_CERT_3(outputDirectory string) {
 	badIntermed1CARecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(expectedLogs)
 
 	goodLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-        goodLeafRecipe.SetIsCertificateValid(true).SetIdentityString()
+    goodLeafRecipe.SetIsCertificateValid(true).SetIdentityString()
 
 	certChain := CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, true, false, true, goodLeafRecipe,badIntermed1CARecipe,goodRootCARecipe)
 	testCertData := CreateTestCertData(certChain)
-        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-CERT-3-CAT1-%d.json", outputDirectory, index))	
+    testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-CERT-03-CAT1-%d.json", outputDirectory, index))	
 }
 
 /*
 Test Description: Basic Constraints is not critical in Intermediate CA
 Applicable To: Intermediate CA
 */
-func SSL_CERT_4(outputDirectory string) {
-        var goodRootCARecipe *badcert.BadCertificate
+func SSL_CERT_04(outputDirectory string) {
+    var goodRootCARecipe *badcert.BadCertificate
 	var badIntermed1CARecipe *badcert.BadCertificate
 	var modifiedIntermed1CAExtensions badcert.ExtensionSlice
 	var goodLeafRecipe *badcert.BadCertificate
@@ -155,6 +158,7 @@ func SSL_CERT_4(outputDirectory string) {
 	expectedLogs = append(expectedLogs, "Basic Constraints extension is not marked critical")
 
 	certProfileDescription := "Basic Constraints is not critical in Intermediate CA"
+	
 	goodRootCARecipe      = BuildDefaultRootCARecipe()        
 	badIntermed1CARecipe  = BuildDefaultIntermed1CARecipe()
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetBasicConstraintsExtension().SetBasicConstraintsExtension(false, true, 0, false)
@@ -173,15 +177,15 @@ func SSL_CERT_4(outputDirectory string) {
 
 	certChain := CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, true, false, true, goodLeafRecipe,badIntermed1CARecipe,goodRootCARecipe)
 	testCertData := CreateTestCertData(certChain)
-        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-CERT-4-CAT1-%d.json", outputDirectory, index))	
+    testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-CERT-04-CAT1-%d.json", outputDirectory, index))	
 }
 
 /*
 Test Description: Basic Constraints has CA set to false in Intermediate CA
 Applicable To: Intermediate CA
 */
-func SSL_CERT_5(outputDirectory string) {
-        var goodRootCARecipe *badcert.BadCertificate
+func SSL_CERT_05(outputDirectory string) {
+    var goodRootCARecipe *badcert.BadCertificate
 	var badIntermed1CARecipe *badcert.BadCertificate
 	var modifiedIntermed1CAExtensions badcert.ExtensionSlice
 	var goodLeafRecipe *badcert.BadCertificate
@@ -192,7 +196,7 @@ func SSL_CERT_5(outputDirectory string) {
 
 	certProfileDescription := "Basic Constraints has CA set to false in Intermediate CA"
 	goodRootCARecipe      = BuildDefaultRootCARecipe()
-        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
+    badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetBasicConstraintsExtension().SetBasicConstraintsExtension(true, false, 0, false)
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
 	goodLeafRecipe      = BuildDefaultLeafRecipe()
@@ -208,15 +212,15 @@ func SSL_CERT_5(outputDirectory string) {
 
 	certChain := CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, true, false, true, goodLeafRecipe,badIntermed1CARecipe,goodRootCARecipe)
 	testCertData := CreateTestCertData(certChain)
-        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-CERT-5-CAT1-%d.json", outputDirectory, index))	
+    testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-CERT-05-CAT1-%d.json", outputDirectory, index))	
 }
 
 /*
 Test Description: KeyUsage Extension is absent in Intermediate CA
 Applicable To: Intermediate CA
 */
-func SSL_CERT_6(outputDirectory string) {
-        var goodRootCARecipe *badcert.BadCertificate
+func SSL_CERT_06(outputDirectory string) {
+    var goodRootCARecipe *badcert.BadCertificate
 	var badIntermed1CARecipe *badcert.BadCertificate
 	var modifiedIntermed1CAExtensions badcert.ExtensionSlice
 	var goodLeafRecipe *badcert.BadCertificate
@@ -227,7 +231,7 @@ func SSL_CERT_6(outputDirectory string) {
 
 	certProfileDescription := "KeyUsage Extension is absent in Intermediate CA"
 	goodRootCARecipe      = BuildDefaultRootCARecipe()
-        badIntermed1CARecipe  = BuildDefaultIntermed1CARecipe()
+    badIntermed1CARecipe  = BuildDefaultIntermed1CARecipe()
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetKeyUsageExtension()
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
 	goodLeafRecipe        = BuildDefaultLeafRecipe()
@@ -239,11 +243,11 @@ func SSL_CERT_6(outputDirectory string) {
 	badIntermed1CARecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(expectedLogs)
 
 	goodLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-        goodLeafRecipe.SetIsCertificateValid(true).SetIdentityString()
+    goodLeafRecipe.SetIsCertificateValid(true).SetIdentityString()
 
 	certChain := CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, true, false, true, goodLeafRecipe,badIntermed1CARecipe,goodRootCARecipe)
 	testCertData := CreateTestCertData(certChain)
-        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-CERT-6-CAT1-%d.json", outputDirectory, index))	
+    testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-CERT-06-CAT1-%d.json", outputDirectory, index))	
 }
 
 
@@ -251,8 +255,8 @@ func SSL_CERT_6(outputDirectory string) {
 Test Description: KeyUsage Extension doesn't contain keyCertSign bit in Intermediate CA
 Applicable To: Intermediate CA
 */
-func SSL_CERT_7(outputDirectory string) {
-        var goodRootCARecipe *badcert.BadCertificate
+func SSL_CERT_07(outputDirectory string) {
+    var goodRootCARecipe *badcert.BadCertificate
 	var badIntermed1CARecipe *badcert.BadCertificate
 	var modifiedIntermed1CAExtensions badcert.ExtensionSlice
 	var goodLeafRecipe *badcert.BadCertificate
@@ -263,7 +267,7 @@ func SSL_CERT_7(outputDirectory string) {
 
 	certProfileDescription := "KeyUsage Extension doesn't contain keyCertSign bit in Intermediate CA"
 	goodRootCARecipe      = BuildDefaultRootCARecipe()
-        badIntermed1CARecipe  = BuildDefaultIntermed1CARecipe()
+    badIntermed1CARecipe  = BuildDefaultIntermed1CARecipe()
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetKeyUsageExtension().SetKeyUsageExtension(true, badcert.KeyUsageDigitalSignature|badcert.KeyUsageCRLSign)
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
 	goodLeafRecipe        = BuildDefaultLeafRecipe()
@@ -275,19 +279,19 @@ func SSL_CERT_7(outputDirectory string) {
 	badIntermed1CARecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(expectedLogs)
 
 	goodLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-        goodLeafRecipe.SetIsCertificateValid(true).SetIdentityString()
+    goodLeafRecipe.SetIsCertificateValid(true).SetIdentityString()
 
 	certChain := CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, true, false, true, goodLeafRecipe,badIntermed1CARecipe,goodRootCARecipe)
 	testCertData := CreateTestCertData(certChain)
-        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-CERT-7-CAT1-%d.json", outputDirectory, index))	
+    testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-CERT-07-CAT1-%d.json", outputDirectory, index))	
 }
 
 /*
 Test Description: Pathlen attribute of BasicConstraints Extension is -2 in Intermediate CA
 Applicable To: Intermediate CA
 */
-func SSL_CERT_8(outputDirectory string) {
-        var goodRootCARecipe *badcert.BadCertificate
+func SSL_CERT_08(outputDirectory string) {
+    var goodRootCARecipe *badcert.BadCertificate
 	var badIntermed1CARecipe *badcert.BadCertificate
 	var modifiedIntermed1CAExtensions badcert.ExtensionSlice
 	var goodLeafRecipe *badcert.BadCertificate
@@ -297,8 +301,9 @@ func SSL_CERT_8(outputDirectory string) {
 	expectedLogs = append(expectedLogs, "Basic Constraints extension 'pathlen' is negative")
 
 	certProfileDescription := "Pathlen attribute of BasicConstraints Extension is -2 in Intermediate CA"
+	
 	goodRootCARecipe      = BuildDefaultRootCARecipe()
-        badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
+    badIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetBasicConstraintsExtension().SetBasicConstraintsExtension(true, true, -2, false)
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
 	goodLeafRecipe      = BuildDefaultLeafRecipe()
@@ -310,19 +315,19 @@ func SSL_CERT_8(outputDirectory string) {
 	badIntermed1CARecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(expectedLogs)
 
 	goodLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-        goodLeafRecipe.SetIsCertificateValid(true).SetIdentityString()
+    goodLeafRecipe.SetIsCertificateValid(true).SetIdentityString()
 
 	certChain := CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, true, false, true, goodLeafRecipe,badIntermed1CARecipe,goodRootCARecipe)
 	testCertData := CreateTestCertData(certChain)
-        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-CERT-8-CAT1-%d.json", outputDirectory, index))	
+    testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-CERT-08-CAT1-%d.json", outputDirectory, index))	
 }
 
 /*
 Test Description: Issuer is empty in Intermediate CA
 Applicable To: Intermediate CA
 */
-func SSL_CERT_9(outputDirectory string) {
-        var goodRootCARecipe *badcert.BadCertificate
+func SSL_CERT_09(outputDirectory string) {
+    var goodRootCARecipe *badcert.BadCertificate
 	var badIntermed1CARecipe *badcert.BadCertificate
 	var goodLeafRecipe *badcert.BadCertificate
 	var index int
@@ -331,6 +336,7 @@ func SSL_CERT_9(outputDirectory string) {
 	expectedLogs = append(expectedLogs, "No name entries found in issuer")
 
 	certProfileDescription := "Issuer is empty in Intermediate CA"
+	
 	goodRootCARecipe      = BuildDefaultRootCARecipe()
 	badIntermed1CARecipe  = BuildDefaultIntermed1CARecipe().SetIssuer(&pkix.Name{})
 	goodLeafRecipe        = BuildDefaultLeafRecipe()
@@ -342,11 +348,11 @@ func SSL_CERT_9(outputDirectory string) {
 	badIntermed1CARecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(expectedLogs)
 
 	goodLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-        goodLeafRecipe.SetIsCertificateValid(true).SetIdentityString()
+    goodLeafRecipe.SetIsCertificateValid(true).SetIdentityString()
 
 	certChain := CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, true, false, true, goodLeafRecipe,badIntermed1CARecipe,goodRootCARecipe)
 	testCertData := CreateTestCertData(certChain)
-        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-CERT-9-CAT1-%d.json", outputDirectory, index))	
+    testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-CERT-09-CAT1-%d.json", outputDirectory, index))	
 }
 
 /*
@@ -629,8 +635,8 @@ func SSL_CERT_17(outputDirectory string) {
 Test Description: Leaf certificate version is 1
 Applicable To: Leaf
 */
-func SSL_LEAF_CERT_1(outputDirectory string) {
-        var goodRootCARecipe *badcert.BadCertificate
+func SSL_LEAF_CERT_01(outputDirectory string) {
+    var goodRootCARecipe *badcert.BadCertificate
 	var goodIntermed1CARecipe *badcert.BadCertificate
 	var badLeafRecipe *badcert.BadCertificate
 	var index int
@@ -640,7 +646,7 @@ func SSL_LEAF_CERT_1(outputDirectory string) {
 
 	certProfileDescription := "Leaf certificate version is 1"
 	goodRootCARecipe      = BuildDefaultRootCARecipe()
-        goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
+    goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	badLeafRecipe         = BuildDefaultLeafRecipe().SetVersion1()
 
 	goodRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
@@ -650,19 +656,19 @@ func SSL_LEAF_CERT_1(outputDirectory string) {
 	goodIntermed1CARecipe.SetIsCertificateValid(true).SetIdentityString()
 
 	badLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-        badLeafRecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(expectedLogs)
+    badLeafRecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(expectedLogs)
 
 	certChain := CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, true, true, false, badLeafRecipe,goodIntermed1CARecipe,goodRootCARecipe)
 	testCertData := CreateTestCertData(certChain)
-        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-LEAF-CERT-1-CAT1-%d.json", outputDirectory, index))	
+    testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-LEAF-CERT-01-CAT1-%d.json", outputDirectory, index))	
 }
 
 /*
 Test Description: Leaf certificate version is 2
 Applicable To: Leaf
 */
-func SSL_LEAF_CERT_2(outputDirectory string) {
-        var goodRootCARecipe *badcert.BadCertificate
+func SSL_LEAF_CERT_02(outputDirectory string) {
+    var goodRootCARecipe *badcert.BadCertificate
 	var goodIntermed1CARecipe *badcert.BadCertificate
 	var badLeafRecipe *badcert.BadCertificate
 	var index int
@@ -672,7 +678,7 @@ func SSL_LEAF_CERT_2(outputDirectory string) {
 
 	certProfileDescription := "Leaf certificate version is 2"
 	goodRootCARecipe      = BuildDefaultRootCARecipe()
-        goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
+    goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	badLeafRecipe         = BuildDefaultLeafRecipe().SetVersion2()
 
 	goodRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
@@ -682,19 +688,19 @@ func SSL_LEAF_CERT_2(outputDirectory string) {
 	goodIntermed1CARecipe.SetIsCertificateValid(true).SetIdentityString()
 
 	badLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-        badLeafRecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(expectedLogs)
+    badLeafRecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(expectedLogs)
 
 	certChain := CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, true, true, false, badLeafRecipe,goodIntermed1CARecipe,goodRootCARecipe)
 	testCertData := CreateTestCertData(certChain)
-        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-LEAF-CERT-2-CAT1-%d.json", outputDirectory, index))	
+    testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-LEAF-CERT-02-CAT1-%d.json", outputDirectory, index))	
 }
 
 /*
 Test Description: KeyUsage extension contains keyCertSign in leaf certificate
 Applicable To: Leaf
 */
-func SSL_LEAF_CERT_3(outputDirectory string) {
-        var goodRootCARecipe *badcert.BadCertificate
+func SSL_LEAF_CERT_03(outputDirectory string) {
+    var goodRootCARecipe *badcert.BadCertificate
 	var goodIntermed1CARecipe *badcert.BadCertificate
 	var badLeafRecipe *badcert.BadCertificate
 	var modifiedLeafExtensions badcert.ExtensionSlice
@@ -705,10 +711,10 @@ func SSL_LEAF_CERT_3(outputDirectory string) {
 
 	certProfileDescription := "KeyUsage extension contains keyCertSign in leaf certificate"
 	goodRootCARecipe      = BuildDefaultRootCARecipe()
-        goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
+    goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	badLeafRecipe         = BuildDefaultLeafRecipe()
-        modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetKeyUsageExtension().SetKeyUsageExtension(false, badcert.KeyUsageCertSign)
-        badLeafRecipe.SetExtensions(modifiedLeafExtensions)
+    modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetKeyUsageExtension().SetKeyUsageExtension(false, badcert.KeyUsageCertSign)
+    badLeafRecipe.SetExtensions(modifiedLeafExtensions)
 	
 	goodRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
 	goodRootCARecipe.SetIsCertificateValid(true).SetIdentityString()
@@ -717,19 +723,19 @@ func SSL_LEAF_CERT_3(outputDirectory string) {
 	goodIntermed1CARecipe.SetIsCertificateValid(true).SetIdentityString()
 
 	badLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-        badLeafRecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(expectedLogs)
+    badLeafRecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(expectedLogs)
 
 	certChain := CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, true, true, false, badLeafRecipe,goodIntermed1CARecipe,goodRootCARecipe)
 	testCertData := CreateTestCertData(certChain)
-        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-LEAF-CERT-3-CAT1-%d.json", outputDirectory, index))	
+    testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-LEAF-CERT-03-CAT1-%d.json", outputDirectory, index))	
 }
 
 /*
 Test Description: BasicConstraints extension contains CA=true in leaf certificate
 Applicable To: Leaf
 */
-func SSL_LEAF_CERT_4(outputDirectory string) {
-        var goodRootCARecipe *badcert.BadCertificate
+func SSL_LEAF_CERT_04(outputDirectory string) {
+    var goodRootCARecipe *badcert.BadCertificate
 	var goodIntermed1CARecipe *badcert.BadCertificate
 	var badLeafRecipe *badcert.BadCertificate
 	var modifiedLeafExtensions badcert.ExtensionSlice
@@ -740,10 +746,10 @@ func SSL_LEAF_CERT_4(outputDirectory string) {
 
 	certProfileDescription := "BasicConstraints extension contains CA=true in leaf certificate"
 	goodRootCARecipe      = BuildDefaultRootCARecipe()
-        goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
+    goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	badLeafRecipe         = BuildDefaultLeafRecipe()
-        modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetBasicConstraintsExtension().SetBasicConstraintsExtension(false, true, 0, false)
-        badLeafRecipe.SetExtensions(modifiedLeafExtensions)
+    modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetBasicConstraintsExtension().SetBasicConstraintsExtension(false, true, 0, false)
+    badLeafRecipe.SetExtensions(modifiedLeafExtensions)
 	
 	goodRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
 	goodRootCARecipe.SetIsCertificateValid(true).SetIdentityString()
@@ -752,19 +758,19 @@ func SSL_LEAF_CERT_4(outputDirectory string) {
 	goodIntermed1CARecipe.SetIsCertificateValid(true).SetIdentityString()
 
 	badLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-        badLeafRecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(expectedLogs)
+    badLeafRecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(expectedLogs)
 
 	certChain := CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, true, true, false, badLeafRecipe,goodIntermed1CARecipe,goodRootCARecipe)
 	testCertData := CreateTestCertData(certChain)
-        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-LEAF-CERT-4-CAT1-%d.json", outputDirectory, index))	
+    testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-LEAF-CERT-04-CAT1-%d.json", outputDirectory, index))	
 }
 
 /*
 Test Description: Issuer name is empty in leaf certificate
 Applicable To: Leaf
 */
-func SSL_LEAF_CERT_5(outputDirectory string) {
-        var goodRootCARecipe *badcert.BadCertificate
+func SSL_LEAF_CERT_05(outputDirectory string) {
+    var goodRootCARecipe *badcert.BadCertificate
 	var goodIntermed1CARecipe *badcert.BadCertificate
 	var badLeafRecipe *badcert.BadCertificate
 	var index int
@@ -774,7 +780,7 @@ func SSL_LEAF_CERT_5(outputDirectory string) {
 
 	certProfileDescription := "Issuer name is empty in leaf certificate"
 	goodRootCARecipe      = BuildDefaultRootCARecipe()
-        goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
+    goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	badLeafRecipe         = BuildDefaultLeafRecipe().SetIssuer(&pkix.Name{})
 
 	goodRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
@@ -784,19 +790,19 @@ func SSL_LEAF_CERT_5(outputDirectory string) {
 	goodIntermed1CARecipe.SetIsCertificateValid(true).SetIdentityString()
 
 	badLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-        badLeafRecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(expectedLogs)
+    badLeafRecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(expectedLogs)
 
 	certChain := CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, true, true, false, badLeafRecipe,goodIntermed1CARecipe,goodRootCARecipe)
 	testCertData := CreateTestCertData(certChain)
-        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-LEAF-CERT-5-CAT1-%d.json", outputDirectory, index))	
+    testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-LEAF-CERT-05-CAT1-%d.json", outputDirectory, index))	
 }
 
 /*
 Test Description: SAN extension is not present and Subject name is empty in leaf certificate
 Applicable To: Leaf
 */
-func SSL_LEAF_CERT_6(outputDirectory string) {
-        var goodRootCARecipe *badcert.BadCertificate
+func SSL_LEAF_CERT_06(outputDirectory string) {
+    var goodRootCARecipe *badcert.BadCertificate
 	var goodIntermed1CARecipe *badcert.BadCertificate
 	var badLeafRecipe *badcert.BadCertificate
 	var modifiedLeafExtensions badcert.ExtensionSlice
@@ -807,10 +813,10 @@ func SSL_LEAF_CERT_6(outputDirectory string) {
 
 	certProfileDescription := "SAN extension is not present and Subject name is empty in leaf certificate"
 	goodRootCARecipe      = BuildDefaultRootCARecipe()
-        goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
+    goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	badLeafRecipe         = BuildDefaultLeafRecipe().SetSubject(&pkix.Name{})
-        modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetSANExtension()
-        badLeafRecipe.SetExtensions(modifiedLeafExtensions)
+    modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetSANExtension()
+    badLeafRecipe.SetExtensions(modifiedLeafExtensions)
 	
 	goodRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
 	goodRootCARecipe.SetIsCertificateValid(true).SetIdentityString()
@@ -819,19 +825,19 @@ func SSL_LEAF_CERT_6(outputDirectory string) {
 	goodIntermed1CARecipe.SetIsCertificateValid(true).SetIdentityString()
 
 	badLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-        badLeafRecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(expectedLogs)
+    badLeafRecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(expectedLogs)
 
 	certChain := CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, true, true, false, badLeafRecipe,goodIntermed1CARecipe,goodRootCARecipe)
 	testCertData := CreateTestCertData(certChain)
-        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-LEAF-CERT-6-CAT1-%d.json", outputDirectory, index))	
+    testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-LEAF-CERT-06-CAT1-%d.json", outputDirectory, index))	
 }
 
 /*
 Test Description: Subject name is empty and SAN extension is set but not marked as critical in leaf certificate
 Applicable To: Leaf
 */
-func SSL_LEAF_CERT_7(outputDirectory string) {
-        var goodRootCARecipe *badcert.BadCertificate
+func SSL_LEAF_CERT_07(outputDirectory string) {
+    var goodRootCARecipe *badcert.BadCertificate
 	var goodIntermed1CARecipe *badcert.BadCertificate
 	var badLeafRecipe *badcert.BadCertificate
 	var modifiedLeafExtensions badcert.ExtensionSlice
@@ -842,10 +848,10 @@ func SSL_LEAF_CERT_7(outputDirectory string) {
 
 	certProfileDescription := "Subject name is empty and SAN extension is set but not marked as critical in leaf certificate"
 	goodRootCARecipe      = BuildDefaultRootCARecipe()
-        goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
+    goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	badLeafRecipe         = BuildDefaultLeafRecipe().SetSubject(&pkix.Name{})
-        modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, []string{"BADCERT-LEAF.cisco.com"}, nil, nil, nil)
-        badLeafRecipe.SetExtensions(modifiedLeafExtensions)
+    modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, []string{"BADCERT-LEAF.cisco.com"}, nil, nil, nil)
+    badLeafRecipe.SetExtensions(modifiedLeafExtensions)
 	
 	goodRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
 	goodRootCARecipe.SetIsCertificateValid(true).SetIdentityString()
@@ -854,19 +860,19 @@ func SSL_LEAF_CERT_7(outputDirectory string) {
 	goodIntermed1CARecipe.SetIsCertificateValid(true).SetIdentityString()
 	
 	badLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-        badLeafRecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(expectedLogs)
+    badLeafRecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(expectedLogs)
 
 	certChain := CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, true, true, false, badLeafRecipe,goodIntermed1CARecipe,goodRootCARecipe)
 	testCertData := CreateTestCertData(certChain)
-        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-LEAF-CERT-7-CAT1-%d.json", outputDirectory, index))	
+    testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-LEAF-CERT-07-CAT1-%d.json", outputDirectory, index))	
 }
 
 /*
 Test Description: Signature Algorithm field in certificate doesn't match with the algorithm in signed certificate in leaf
 Applicable To: Leaf
 */
-func SSL_LEAF_CERT_8(outputDirectory string) {
-        var goodRootCARecipe *badcert.BadCertificate
+func SSL_LEAF_CERT_08(outputDirectory string) {
+    var goodRootCARecipe *badcert.BadCertificate
 	var goodIntermed1CARecipe *badcert.BadCertificate
 	var badLeafRecipe *badcert.BadCertificate
 	var index int
@@ -876,7 +882,7 @@ func SSL_LEAF_CERT_8(outputDirectory string) {
 
 	certProfileDescription := "Signature Algorithm field in certificate doesn't match with the algorithm in signed certificate in leaf"
 	goodRootCARecipe      = BuildDefaultRootCARecipe()
-        goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
+    goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	badLeafRecipe      = BuildDefaultLeafRecipe().SetSignatureAlgorithmFromPrivateKey(defaultCertificateParams.LeafKey, badcert.SHA384WithRSA)
 
 	goodRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
@@ -886,11 +892,11 @@ func SSL_LEAF_CERT_8(outputDirectory string) {
 	goodIntermed1CARecipe.SetIsCertificateValid(true).SetIdentityString()
 
 	badLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-        badLeafRecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(expectedLogs)
+    badLeafRecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(expectedLogs)
 
 	certChain := CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, true, true, false, badLeafRecipe,goodIntermed1CARecipe,goodRootCARecipe)
 	testCertData := CreateTestCertData(certChain)
-        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-LEAF-CERT-8-CAT1-%d.json", outputDirectory, index))	
+    testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-LEAF-CERT-08-CAT1-%d.json", outputDirectory, index))	
 }
 
 
@@ -898,8 +904,8 @@ func SSL_LEAF_CERT_8(outputDirectory string) {
 Test Description: AKID Extension is not present in Leaf certificate
 Applicable To: Leaf
 */
-func SSL_LEAF_CERT_9(outputDirectory string) {
-        var goodRootCARecipe *badcert.BadCertificate
+func SSL_LEAF_CERT_09(outputDirectory string) {
+    var goodRootCARecipe *badcert.BadCertificate
 	var goodIntermed1CARecipe *badcert.BadCertificate
 	var badLeafRecipe *badcert.BadCertificate
 	var modifiedLeafExtensions badcert.ExtensionSlice
@@ -913,7 +919,7 @@ func SSL_LEAF_CERT_9(outputDirectory string) {
 	goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	badLeafRecipe      = BuildDefaultLeafRecipe().SetIsCertificateValid(false)
 	modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetAKIDExtension()
-        badLeafRecipe.SetExtensions(modifiedLeafExtensions)
+    badLeafRecipe.SetExtensions(modifiedLeafExtensions)
 
 	goodRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
 	goodRootCARecipe.SetIsCertificateValid(true).SetIdentityString()
@@ -922,18 +928,18 @@ func SSL_LEAF_CERT_9(outputDirectory string) {
 	goodIntermed1CARecipe.SetIsCertificateValid(true).SetIdentityString()
 
 	badLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-        badLeafRecipe.SetIdentityString().SetExpectedLogs(expectedLogs)
+    badLeafRecipe.SetIdentityString().SetExpectedLogs(expectedLogs)
 
 	certChain := CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, true, true, false, badLeafRecipe,goodIntermed1CARecipe,goodRootCARecipe)
 	testCertData := CreateTestCertData(certChain)
-        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-LEAF-CERT-9-CAT1-%d.json", outputDirectory, index))	
+    testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-LEAF-CERT-09-CAT1-%d.json", outputDirectory, index))	
 }
 
 /*
 Test Description: AKID Extension is present but contains no KeyId in Leaf certificate
 Applicable To: Leaf
 func SSL_LEAF_CERT_10(outputDirectory string) {
-        var goodRootCARecipe *badcert.BadCertificate
+    var goodRootCARecipe *badcert.BadCertificate
 	var goodIntermed1CARecipe *badcert.BadCertificate
 	var badLeafRecipe *badcert.BadCertificate
 	var modifiedLeafExtensions badcert.ExtensionSlice
@@ -944,10 +950,10 @@ func SSL_LEAF_CERT_10(outputDirectory string) {
 
 	certProfileDescription := "AKID Extension is present but contains no KeyId in Leaf certificate"
 	goodRootCARecipe      = BuildDefaultRootCARecipe()
-        goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
+    goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	badLeafRecipe      = BuildDefaultLeafRecipe()
 	modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetAKIDExtension().SetAKIDExtension(false, nil)
-        badLeafRecipe.SetExtensions(modifiedLeafExtensions)
+    badLeafRecipe.SetExtensions(modifiedLeafExtensions)
 
 	goodRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
 	goodRootCARecipe.SetIsCertificateValid(true).SetIdentityString()
@@ -956,11 +962,11 @@ func SSL_LEAF_CERT_10(outputDirectory string) {
 	goodIntermed1CARecipe.SetIsCertificateValid(true).SetIdentityString()
 
 	badLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-        badLeafRecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(expectedLogs)
+    badLeafRecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(expectedLogs)
 
 	certChain := CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, true, true, false, badLeafRecipe,goodIntermed1CARecipe,goodRootCARecipe)
 	testCertData := CreateTestCertData(certChain)
-        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-LEAF-CERT-10-CAT1-%d.json", outputDirectory, index))	
+    testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-LEAF-CERT-10-CAT1-%d.json", outputDirectory, index))	
 }
 */
 
@@ -969,7 +975,7 @@ Test Description: AKID Extension is set to critical in Leaf certificate
 Applicable To: Leaf
 */
 func SSL_LEAF_CERT_11(outputDirectory string) {
-        var goodRootCARecipe *badcert.BadCertificate
+    var goodRootCARecipe *badcert.BadCertificate
 	var goodIntermed1CARecipe *badcert.BadCertificate
 	var badLeafRecipe *badcert.BadCertificate
 	var modifiedLeafExtensions badcert.ExtensionSlice
@@ -980,10 +986,10 @@ func SSL_LEAF_CERT_11(outputDirectory string) {
 
 	certProfileDescription := "AKID Extension is set to critical in Leaf certificate"
 	goodRootCARecipe      = BuildDefaultRootCARecipe()
-        goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
+    goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	badLeafRecipe      = BuildDefaultLeafRecipe()
 	modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetAKIDExtension().SetAKIDExtensionFromKey(true, defaultCertificateParams.Intermed1CAPubkey)
-        badLeafRecipe.SetExtensions(modifiedLeafExtensions)
+    badLeafRecipe.SetExtensions(modifiedLeafExtensions)
 
 	goodRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
 	goodRootCARecipe.SetIsCertificateValid(true).SetIdentityString()
@@ -992,11 +998,11 @@ func SSL_LEAF_CERT_11(outputDirectory string) {
 	goodIntermed1CARecipe.SetIsCertificateValid(true).SetIdentityString()
 
 	badLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-        badLeafRecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(expectedLogs)
+    badLeafRecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(expectedLogs)
 
 	certChain := CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, true, true, false, badLeafRecipe,goodIntermed1CARecipe,goodRootCARecipe)
 	testCertData := CreateTestCertData(certChain)
-        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-LEAF-CERT-11-CAT1-%d.json", outputDirectory, index))
+    testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-LEAF-CERT-11-CAT1-%d.json", outputDirectory, index))
 }
 
 /*
@@ -1004,7 +1010,7 @@ Test Description: SKID Extension is set to critical in Leaf certificate
 Applicable To: Leaf
 */
 func SSL_LEAF_CERT_12(outputDirectory string) {
-        var goodRootCARecipe *badcert.BadCertificate
+    var goodRootCARecipe *badcert.BadCertificate
 	var goodIntermed1CARecipe *badcert.BadCertificate
 	var badLeafRecipe *badcert.BadCertificate
 	var modifiedLeafExtensions badcert.ExtensionSlice
@@ -1015,10 +1021,10 @@ func SSL_LEAF_CERT_12(outputDirectory string) {
 
 	certProfileDescription := "SKID Extension is set to critical in Leaf certificate"
 	goodRootCARecipe      = BuildDefaultRootCARecipe()
-        goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
+    goodIntermed1CARecipe = BuildDefaultIntermed1CARecipe()
 	badLeafRecipe         = BuildDefaultLeafRecipe()
 	modifiedLeafExtensions = badLeafRecipe.GetExtensions().UnsetSKIDExtension().SetSKIDExtensionFromKey(true, defaultCertificateParams.LeafPubkey)
-        badLeafRecipe.SetExtensions(modifiedLeafExtensions)
+    badLeafRecipe.SetExtensions(modifiedLeafExtensions)
 
 	goodRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
 	goodRootCARecipe.SetIsCertificateValid(true).SetIdentityString()
@@ -1027,26 +1033,26 @@ func SSL_LEAF_CERT_12(outputDirectory string) {
 	goodIntermed1CARecipe.SetIsCertificateValid(true).SetIdentityString()
 
 	badLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
-        badLeafRecipe.SetIsCertificateValid(false).SetExpectedLogs(expectedLogs).SetIdentityString()
+    badLeafRecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(expectedLogs)
 
 	certChain := CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, true, true, false, badLeafRecipe,goodIntermed1CARecipe,goodRootCARecipe)
 	testCertData := CreateTestCertData(certChain)
-        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-LEAF-CERT-12-CAT1-%d.json", outputDirectory, index))
+    testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/SSL-LEAF-CERT-12-CAT1-%d.json", outputDirectory, index))
 }
 
 
 
 func GenerateSSLCerts(sslCertOutputDirectory string) {
 	CreateDirectory(sslCertOutputDirectory)
-	SSL_CERT_1(sslCertOutputDirectory)
-	SSL_CERT_2(sslCertOutputDirectory)
-	SSL_CERT_3(sslCertOutputDirectory)
-	SSL_CERT_4(sslCertOutputDirectory)
-	SSL_CERT_5(sslCertOutputDirectory)
-	SSL_CERT_6(sslCertOutputDirectory)
-	SSL_CERT_7(sslCertOutputDirectory)
-	SSL_CERT_8(sslCertOutputDirectory)
-	SSL_CERT_9(sslCertOutputDirectory)
+	SSL_CERT_01(sslCertOutputDirectory)
+	SSL_CERT_02(sslCertOutputDirectory)
+	SSL_CERT_03(sslCertOutputDirectory)
+	SSL_CERT_04(sslCertOutputDirectory)
+	SSL_CERT_05(sslCertOutputDirectory)
+	SSL_CERT_06(sslCertOutputDirectory)
+	SSL_CERT_07(sslCertOutputDirectory)
+	SSL_CERT_08(sslCertOutputDirectory)
+	SSL_CERT_09(sslCertOutputDirectory)
 	SSL_CERT_10(sslCertOutputDirectory)
 	SSL_CERT_11(sslCertOutputDirectory)
 	SSL_CERT_12(sslCertOutputDirectory)
@@ -1057,15 +1063,15 @@ func GenerateSSLCerts(sslCertOutputDirectory string) {
 	SSL_CERT_17(sslCertOutputDirectory)
 
 
-	SSL_LEAF_CERT_1(sslCertOutputDirectory)
-	SSL_LEAF_CERT_2(sslCertOutputDirectory)
-	SSL_LEAF_CERT_3(sslCertOutputDirectory)
-	SSL_LEAF_CERT_4(sslCertOutputDirectory)
-	SSL_LEAF_CERT_5(sslCertOutputDirectory)
-	SSL_LEAF_CERT_6(sslCertOutputDirectory)
-	SSL_LEAF_CERT_7(sslCertOutputDirectory)
-	SSL_LEAF_CERT_8(sslCertOutputDirectory)
-	SSL_LEAF_CERT_9(sslCertOutputDirectory)
+	SSL_LEAF_CERT_01(sslCertOutputDirectory)
+	SSL_LEAF_CERT_02(sslCertOutputDirectory)
+	SSL_LEAF_CERT_03(sslCertOutputDirectory)
+	SSL_LEAF_CERT_04(sslCertOutputDirectory)
+	SSL_LEAF_CERT_05(sslCertOutputDirectory)
+	SSL_LEAF_CERT_06(sslCertOutputDirectory)
+	SSL_LEAF_CERT_07(sslCertOutputDirectory)
+	SSL_LEAF_CERT_08(sslCertOutputDirectory)
+	SSL_LEAF_CERT_09(sslCertOutputDirectory)
 	//SSL_LEAF_CERT_10(sslCertOutputDirectory)
 	SSL_LEAF_CERT_11(sslCertOutputDirectory)
 	SSL_LEAF_CERT_12(sslCertOutputDirectory)

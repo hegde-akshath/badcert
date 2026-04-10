@@ -22,6 +22,7 @@ type TestCertData struct {
 	ExpectedLogs []string
 } 
 
+
 func CreateTestCertData(badCertChain BadCertificateChain) (*TestCertData) {
 	var testCertData TestCertData
         var buf bytes.Buffer
@@ -102,4 +103,5 @@ func (testCertData *TestCertData) WriteTestCertDataJson(filepath string) {
     defer f.Close()
     f.Write([]byte(fullChain))
 }
+
 

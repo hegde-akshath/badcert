@@ -734,21 +734,21 @@ func (badcert *BadCertificate) SetIdentityString() (*BadCertificate) {
 
 	subject := badcert.x509Certificate.Subject.String()
 	if subject == "" {
-		subject = "EMPTY"
+		subject = "N/A"
 	}
 
 	issuer := badcert.x509Certificate.Issuer.String()
 	if issuer == "" {
-		issuer = "EMPTY"
+		issuer = "N/A"
 	}
 
 	serialInt = badcert.x509Certificate.SerialNumber
 	if serialInt == nil {
-		serialString = "EMPTY"
+		serialString = "N/A"
 	} else {
 		serialString = serialInt.String()
 		if serialString == "" {
-			serialString = "EMPTY"
+			serialString = "N/A"
 		}
 	}
 

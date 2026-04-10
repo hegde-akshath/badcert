@@ -125,11 +125,20 @@ func BuildBadCertificateChains(badRootCARecipe *badcert.BadCertificate, badInter
 	return &badCertificateChains
 }
 
-//This is meant to be a quick generator of combinations of a 3 level cert chain with a leaf thats always good. 
-//It accepts bad certificates for root and intermed1 CAs. It uses a good leaf certificate generated from default recipe
+//This is meant to be a quick generator of combinations of a 3 level cert chain
+//The recipes for bad Root CA and bad Intermediate CA are passed by the caller
+//Default recipes are used for good Root CA, Intermediate CA and Leaf
+//It adds the metadata for the badcert Object
+//Using these 5 recipes, it creates 4 different Certificate Chains
+//    - CHAIN 1 = Bad Root CA  -> Good Leaf
+//    - CHAIN 2 = Good Root CA -> Bad Intermediate CA  -> Good Leaf
+//    - CHAIN 3 = Bad Root CA  -> Good Intermediate CA -> Good Leaf
+//    - CHAIN 4 = Bad Root CA  -> Bad Intermediate CA  -> Good Leaf
 //The keys used for signing are from default parameters
-//So it can't be sued in cases where the bad certificate is created due to modification related to key or signature params
-//Or a chain with a different setup
+//This function can't be used when
+//A] The bad certificate is created due to modification related to key or signature params
+//B] User provided good Root CA, Intermediate CA, Leaf recipes
+//   etc
 //In such cases, use the underlying cert generation functions directly
 func BuildBadCACertificateChains(badRootCARecipe *badcert.BadCertificate, badIntermed1CARecipe *badcert.BadCertificate, certProfileBaseDescription string, badRootCAExpectedLogs []string, badIntermed1CAExpectedLogs []string) (*BadCertificateChains) {
 	goodRootCARecipe      := BuildDefaultRootCARecipe()
@@ -166,4 +175,5 @@ func BuildBadCACertificateChains(badRootCARecipe *badcert.BadCertificate, badInt
 	badCertificateChains := CreateBadCertificateChains(certChain1, certChain2, certChain3, certChain4)
 	return &badCertificateChains
 }
+
 
