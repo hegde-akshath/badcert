@@ -635,117 +635,180 @@ func CA_AUTHENTICATE_CERT_BAD_18(outputDirectory string, pythonCertDataGenerator
 }
 
 /*
-Test Description: 
-Version is 1 in Root CA
-Basic Constraints Absent in Intermediate CA
+Test Description: Different errors in Root CA and Intermediate CA - 1
+Root CA:        Version is 1
+IntermediateCA: Version is 2
 */
 func CA_AUTHENTICATE_CERT_BAD_19(outputDirectory string, pythonCertDataGenerator *PythonCertDataGenerator) {
 	var badRootCARecipe *badcert.BadCertificate
 	var badIntermed1CARecipe *badcert.BadCertificate
-	var modifiedIntermed1CAExtensions badcert.ExtensionSlice
 	var badCertificateChain BadCertificateChain
+	var goodLeafRecipe *badcert.BadCertificate
 	var index int
 	var rootCAExpectedLogs []string
 	var intermed1CAExpectedLogs []string
 
 	rootCAExpectedLogs      = append(rootCAExpectedLogs, "X509 certificate version is not 3")
-	intermed1CAExpectedLogs = append(intermed1CAExpectedLogs, "Basic Constraints extension not found in certificate")
+	intermed1CAExpectedLogs = append(intermed1CAExpectedLogs, "X509 certificate version is not 3")
 
-	certProfileDescription := "Version is 1 in Root CA. Basic Constraints is absent in Intermediate CA"
+	certProfileDescription := "Version is 1 in Root CA. Version is 2 in Intermediate CA"
     
 	badRootCARecipe               = BuildDefaultRootCARecipe().SetVersion1()
+	badRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
+	badRootCARecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(rootCAExpectedLogs)
 
-	badIntermed1CARecipe          = BuildDefaultIntermed1CARecipe()
-	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetBasicConstraintsExtension()
-	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
+	badIntermed1CARecipe          = BuildDefaultIntermed1CARecipe().SetVersion2()
+    badIntermed1CARecipe.SignTBS(defaultCertificateParams.RootCAKey,defaultCertificateParams.SignatureAlgorithm)
+	badIntermed1CARecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(intermed1CAExpectedLogs)
+	
+	goodLeafRecipe = BuildDefaultLeafRecipe()
+	goodLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
+	goodLeafRecipe.SetIsCertificateValid(true).SetIdentityString()
 
-	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription, rootCAExpectedLogs, intermed1CAExpectedLogs)
-	for index, badCertificateChain = range *badCertificateChains {
-	    testCertData := CreateTestCertData(badCertificateChain)
-		testId := fmt.Sprintf("CA-AUTH-CERT-BAD-19-CAT1-%d", index)
-        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CA-AUTH-CERT-BAD-19-CAT1-%d.json", outputDirectory, index))
-	    pythonCertDataGenerator.AddTestCertData(testId, testCertData) 
-	}
+    badCertificateChain = CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, false, false, true, goodLeafRecipe, badIntermed1CARecipe,badRootCARecipe)
+	testCertData := CreateTestCertData(badCertificateChain)
+	testId := fmt.Sprintf("CA-AUTH-CERT-BAD-19-CAT1-%d", index)
+	testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CA-AUTH-CERT-BAD-19-CAT1-%d.json", outputDirectory, index))
+	pythonCertDataGenerator.AddTestCertData(testId, testCertData)
 }
 
 /*
-Test Description: 
-SKID extension is absent in Root CA
-KeyUsage extension doesn't contain keyCertSign in Intermediate CA
+Test Description: Different errors in Root CA and Intermediate CA - 2
+Root CA:         SKID extension is absent
+Intermediate CA: KeyUsage extension is absent
 */
 func CA_AUTHENTICATE_CERT_BAD_20(outputDirectory string, pythonCertDataGenerator *PythonCertDataGenerator) {
 	var badRootCARecipe *badcert.BadCertificate
 	var modifiedRootCAExtensions badcert.ExtensionSlice
 	var badIntermed1CARecipe *badcert.BadCertificate
 	var modifiedIntermed1CAExtensions badcert.ExtensionSlice
+	var goodLeafRecipe *badcert.BadCertificate
 	var badCertificateChain BadCertificateChain
 	var index int
     var rootCAExpectedLogs []string
 	var intermed1CAExpectedLogs []string
 
 	rootCAExpectedLogs      = append(rootCAExpectedLogs, "Subject Key Identifier extension not found")
-	intermed1CAExpectedLogs = append(intermed1CAExpectedLogs, "Key Usage extension missing keyCertSign flag")
+	intermed1CAExpectedLogs = append(intermed1CAExpectedLogs, "Key Usage extension not found in certificate")
  
-	certProfileDescription := "SKID extension is absent in Root CA. KeyUsage extension doesn't contain keyCertSign in Intermediate CA"
+	certProfileDescription := "Root CA: SKID extension is absent. Intermediate CA: KeyUsage extension is absent"
     
-	badRootCARecipe               = BuildDefaultRootCARecipe().SetVersion1()
+	badRootCARecipe               = BuildDefaultRootCARecipe()
     modifiedRootCAExtensions = badRootCARecipe.GetExtensions().UnsetSKIDExtension()
 	badRootCARecipe.SetExtensions(modifiedRootCAExtensions)
+    badRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
+	badRootCARecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(rootCAExpectedLogs)
 
 	badIntermed1CARecipe          = BuildDefaultIntermed1CARecipe()	
-    modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetKeyUsageExtension().SetKeyUsageExtension(false, badcert.KeyUsageDigitalSignature|badcert.KeyUsageCRLSign)
+    modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetKeyUsageExtension()
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
+    badIntermed1CARecipe.SignTBS(defaultCertificateParams.RootCAKey,defaultCertificateParams.SignatureAlgorithm)
+	badIntermed1CARecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(intermed1CAExpectedLogs)
+	
+	goodLeafRecipe = BuildDefaultLeafRecipe()
+	goodLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
+	goodLeafRecipe.SetIsCertificateValid(true).SetIdentityString()
 
-	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription, rootCAExpectedLogs, intermed1CAExpectedLogs)
-	for index, badCertificateChain = range *badCertificateChains {
-	    testCertData := CreateTestCertData(badCertificateChain)
-		testId := fmt.Sprintf("CA-AUTH-CERT-BAD-20-CAT1-%d", index)
-        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CA-AUTH-CERT-BAD-20-CAT1-%d.json", outputDirectory, index))
-	    pythonCertDataGenerator.AddTestCertData(testId, testCertData) 
-	}
+    badCertificateChain = CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, false, false, true, goodLeafRecipe, badIntermed1CARecipe,badRootCARecipe)
+	testCertData := CreateTestCertData(badCertificateChain)
+	testId := fmt.Sprintf("CA-AUTH-CERT-BAD-20-CAT1-%d", index)
+	testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CA-AUTH-CERT-BAD-20-CAT1-%d.json", outputDirectory, index))
+	pythonCertDataGenerator.AddTestCertData(testId, testCertData)
 }
 
 /*
-Test Description: 
-Version is 1 in Root CA. AKID contains no KeyId in Root CA
-Basic Constraints Absent in Intermediate CA. SAN contains no names in Intermediate CA
+Test Description: Multiple errors in both Root CA and Intermedicate CA
+Root CA:
+    - Version is 1
+    - SAN contains no names
+Intermediate CA:
+	- Version is 2
+    - SAN contains no names
 */
 func CA_AUTHENTICATE_CERT_BAD_21(outputDirectory string, pythonCertDataGenerator *PythonCertDataGenerator) {
 	var badRootCARecipe *badcert.BadCertificate
 	var modifiedRootCAExtensions badcert.ExtensionSlice
 	var badIntermed1CARecipe *badcert.BadCertificate
 	var modifiedIntermed1CAExtensions badcert.ExtensionSlice
+	var goodLeafRecipe *badcert.BadCertificate
 	var badCertificateChain BadCertificateChain
 	var index int
 	var rootCAExpectedLogs []string
 	var intermed1CAExpectedLogs []string
 
 	rootCAExpectedLogs      = append(rootCAExpectedLogs, "X509 certificate version is not 3")
-	rootCAExpectedLogs      = append(rootCAExpectedLogs, "Key Identifier in Authority Key Identifier extension is empty")
-
-	intermed1CAExpectedLogs = append(intermed1CAExpectedLogs, "Basic Constraints extension not found in certificate")
+    rootCAExpectedLogs      = append(rootCAExpectedLogs, "No general names found in Subject Alternative Name extension")
+	intermed1CAExpectedLogs = append(intermed1CAExpectedLogs, "X509 certificate version is not 3")
 	intermed1CAExpectedLogs = append(intermed1CAExpectedLogs, "No general names found in Subject Alternative Name extension")
 
-	certProfileDescription := "Version is 1 in Root CA. AKID contains no KeyId in Root CA. Basic Constraints is absent in Intermediate CA. SAN contains no names in Intermediate CA"
+	certProfileDescription := "Root CA: Version is 1. Intermediate CA: Version is 2, SAN contains no names."
     
 	badRootCARecipe               = BuildDefaultRootCARecipe().SetVersion1()
-    modifiedRootCAExtensions      = badRootCARecipe.GetExtensions().UnsetAKIDExtension().SetAKIDExtensionFromKey(false, nil)
+	modifiedRootCAExtensions      = badRootCARecipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, nil, nil, nil, nil)
 	badRootCARecipe.SetExtensions(modifiedRootCAExtensions)
+	badRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
+	badRootCARecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(rootCAExpectedLogs)
 
-	badIntermed1CARecipe          = BuildDefaultIntermed1CARecipe()
-	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetBasicConstraintsExtension()
-	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
+	badIntermed1CARecipe          = BuildDefaultIntermed1CARecipe().SetVersion2()
 	modifiedIntermed1CAExtensions = badIntermed1CARecipe.GetExtensions().UnsetSANExtension().SetSANExtension(false, nil, nil, nil, nil)
 	badIntermed1CARecipe.SetExtensions(modifiedIntermed1CAExtensions)
+	badIntermed1CARecipe.SignTBS(defaultCertificateParams.RootCAKey,defaultCertificateParams.SignatureAlgorithm)
+	badIntermed1CARecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(intermed1CAExpectedLogs)
 	
-	badCertificateChains := BuildBadCACertificateChains(badRootCARecipe, badIntermed1CARecipe, certProfileDescription, rootCAExpectedLogs, intermed1CAExpectedLogs)
-	for index, badCertificateChain = range *badCertificateChains {
-	    testCertData := CreateTestCertData(badCertificateChain)
-		testId := fmt.Sprintf("CA-AUTH-CERT-BAD-21-CAT1-%d", index)
-        testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CA-AUTH-CERT-BAD-21-CAT1-%d.json", outputDirectory, index))
-	    pythonCertDataGenerator.AddTestCertData(testId, testCertData) 
-	}
+	goodLeafRecipe = BuildDefaultLeafRecipe()
+	goodLeafRecipe.SignTBS(defaultCertificateParams.Intermed1CAKey, defaultCertificateParams.SignatureAlgorithm)
+	goodLeafRecipe.SetIsCertificateValid(true).SetIdentityString()
+
+	badCertificateChain = CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, false, false, true, goodLeafRecipe, badIntermed1CARecipe,badRootCARecipe)
+	testCertData := CreateTestCertData(badCertificateChain)
+	testId := fmt.Sprintf("CA-AUTH-CERT-BAD-21-CAT1-%d", index)
+	testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CA-AUTH-CERT-BAD-21-CAT1-%d.json", outputDirectory, index))
+	pythonCertDataGenerator.AddTestCertData(testId, testCertData)
+
 }
+
+
+/*
+Test Description: 
+Root CA: Multiple errors in same field of Root CA
+    - Version is 1
+	- AKID is critical
+	- AKID contains no KeyId
+	Do not include any intermediate CA by intent(internal reasons)
+*/
+func CA_AUTHENTICATE_CERT_BAD_22(outputDirectory string, pythonCertDataGenerator *PythonCertDataGenerator) {
+	var badRootCARecipe *badcert.BadCertificate
+	var modifiedRootCAExtensions badcert.ExtensionSlice
+	var goodLeafRecipe *badcert.BadCertificate
+	var badCertificateChain BadCertificateChain
+	var index int
+	var rootCAExpectedLogs []string
+
+	rootCAExpectedLogs      = append(rootCAExpectedLogs, "X509 certificate version is not 3")
+	rootCAExpectedLogs      = append(rootCAExpectedLogs, "Authority Key Identifier extension is marked critical")
+	rootCAExpectedLogs      = append(rootCAExpectedLogs, "Key Identifier in Authority Key Identifier extension is empty")
+
+	certProfileDescription := "Root CA: Version is 1, AKID is critical, AKID contains no KeyId."
+	
+	badRootCARecipe               = BuildDefaultRootCARecipe().SetVersion1()
+    modifiedRootCAExtensions      = badRootCARecipe.GetExtensions().UnsetAKIDExtension().SetAKIDExtensionFromKey(true, nil)
+	badRootCARecipe.SetExtensions(modifiedRootCAExtensions)
+	badRootCARecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
+	badRootCARecipe.SetIsCertificateValid(false).SetIdentityString().SetExpectedLogs(rootCAExpectedLogs)
+	
+	goodLeafRecipe = BuildDefaultLeafRecipe()
+	goodLeafRecipe.SignTBS(defaultCertificateParams.RootCAKey, defaultCertificateParams.SignatureAlgorithm)
+	goodLeafRecipe.SetIsCertificateValid(true).SetIdentityString()
+
+	badCertificateChain = CreateBadCertificateChain(certProfileDescription, defaultCertificateParams.LeafKey, false, true, true, goodLeafRecipe, badRootCARecipe)
+	testCertData := CreateTestCertData(badCertificateChain)
+	testId := fmt.Sprintf("CA-AUTH-CERT-BAD-22-CAT1-%d", index)
+	testCertData.WriteTestCertDataJson(fmt.Sprintf("%s/CA-AUTH-CERT-BAD-22-CAT1-%d.json", outputDirectory, index))
+	pythonCertDataGenerator.AddTestCertData(testId, testCertData)
+
+}
+
+
 
 /*
 Test Description: SAN is not present
@@ -852,6 +915,7 @@ func GenerateCAAuthenticateCerts(caAuthenticateCertOutputDirectory string) {
 	CA_AUTHENTICATE_CERT_BAD_19(caAuthenticateCertOutputDirectory, pythonCertDataGenerator)
 	CA_AUTHENTICATE_CERT_BAD_20(caAuthenticateCertOutputDirectory, pythonCertDataGenerator)
 	CA_AUTHENTICATE_CERT_BAD_21(caAuthenticateCertOutputDirectory, pythonCertDataGenerator)
+	CA_AUTHENTICATE_CERT_BAD_22(caAuthenticateCertOutputDirectory, pythonCertDataGenerator)
 
 	CA_AUTHENTICATE_CERT_GOOD_01(caAuthenticateCertOutputDirectory, pythonCertDataGenerator)
 	CA_AUTHENTICATE_CERT_GOOD_02(caAuthenticateCertOutputDirectory, pythonCertDataGenerator)
